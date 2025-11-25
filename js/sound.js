@@ -34,7 +34,7 @@ class SoundManager {
       levelup: 'assets/sounds/effects/levelup.wav',
       button: 'assets/sounds/effects/button.mp3',
       bomb: 'assets/sounds/effects/bomb.flac',
-      cannabis: 'assets/sounds/effects/cannabis.wav' // Neuer Sound für Cannabis-Einsammeln
+      cannabis: 'assets/sounds/effects/cannabis.wav' // Smoke Sound (132625__nakhas__consuming-cigarette-breathes.wav)
     };
     
     // Fallback: Versuche auch andere Formate

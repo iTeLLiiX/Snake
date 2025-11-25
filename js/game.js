@@ -198,12 +198,29 @@ class Game {
     this.isPaused = false;
     this.lastTime = performance.now();
     
+    // WICHTIG: Snake sofort starten - lastMove auf speed setzen für sofortige Bewegung
+    if (this.snake) {
+      this.snake.lastMove = this.snake.speed;
+    }
+    
     // Game Loop sofort starten (auch ohne DevTools)
-    // Verwende requestAnimationFrame mit sofortigem Call
+    // Doppelter Call für garantierten Start
     requestAnimationFrame((time) => {
       this.lastTime = time;
       this.gameLoop(time);
     });
+    
+    // Zusätzlicher sofortiger Call für garantierten Start
+    setTimeout(() => {
+      if (this.isRunning && !this.isPaused) {
+        requestAnimationFrame((time) => {
+          if (this.lastTime === 0) {
+            this.lastTime = time;
+          }
+          this.gameLoop(time);
+        });
+      }
+    }, 0);
     
     // Musik starten
     if (window.soundManager) {
@@ -426,9 +443,12 @@ class Game {
       this.particles.explode(foodX, foodY, 'bomb', 15);
       if (window.soundManager) window.soundManager.playSound('bomb');
     } else if (this.food.type === 'special') {
-      // Spezieller Effekt für Marijuana
+      // Spezieller Effekt für Marijuana - NUR Smoke Sound
       this.particles.burst(foodX, foodY, 'special', 20);
-      if (window.soundManager) window.soundManager.playSound('cannabis'); // Neuer Cannabis-Sound!
+      if (window.soundManager) {
+        // Nur Smoke Sound abspielen (cannabis.wav = 132625__nakhas__consuming-cigarette-breathes.wav)
+        window.soundManager.playSound('cannabis');
+      }
     } else if (this.food.type === 'easter_egg') {
       // Mega-Bonus Effekt
       this.particles.explode(foodX, foodY, 'levelup', 25);
