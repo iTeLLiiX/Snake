@@ -163,7 +163,7 @@ class UIManager {
         );
       } else {
         // Erster Screen - einfacher Fade
-        targetScreen.style.display = 'flex';
+        targetScreen.style.display = 'flex'; // WICHTIG: Display setzen
         targetScreen.style.opacity = '0';
         targetScreen.classList.add('active');
         setTimeout(() => {
@@ -182,8 +182,8 @@ class UIManager {
       });
       
       setTimeout(() => {
+        targetScreen.style.display = 'flex'; // WICHTIG: Display setzen BEVOR active Klasse
         targetScreen.classList.add('fade-in', 'active');
-        targetScreen.style.display = 'flex';
         setTimeout(() => {
           targetScreen.classList.remove('fade-in');
         }, 500);
@@ -195,6 +195,7 @@ class UIManager {
   hideAllScreens() {
     Object.values(this.screens).forEach(screen => {
       screen.classList.remove('active');
+      screen.style.display = 'none'; // Sicherstellen dass Screen versteckt ist
     });
   }
   

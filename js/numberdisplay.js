@@ -75,6 +75,8 @@ class NumberDisplay {
       canvas = document.createElement('canvas');
       canvas.style.display = 'block';
       canvas.style.imageRendering = 'pixelated';
+      canvas.style.filter = 'drop-shadow(0 0 3px rgba(76, 175, 80, 0.8))';
+      canvas.style.background = 'transparent';
       element.innerHTML = '';
       element.appendChild(canvas);
     }

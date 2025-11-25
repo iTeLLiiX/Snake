@@ -386,6 +386,11 @@ html, body {
 /* Number-Sprites Canvas */
 .score-value canvas,
 .level-value canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 3px rgba(76, 175, 80, 0.8));
+  background: transparent;
   display: inline-block;
   vertical-align: middle;
   image-rendering: pixelated;
@@ -566,6 +571,14 @@ html, body {
 
 .score-value,
 .level-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 60px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--green-light);
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
   color: var(--green-light);
   font-weight: 700;
   font-size: 1.1rem;
@@ -610,8 +623,9 @@ html, body {
 .game-canvas:hover {
   transform: translateZ(10px) rotateX(2deg);
 }
-  
-  /* Performance-Optimierungen für flüssiges 60 FPS Rendering */
+
+/* Performance-Optimierungen für flüssiges 60 FPS Rendering */
+#gameCanvas {
   touch-action: none;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
