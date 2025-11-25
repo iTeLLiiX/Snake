@@ -205,8 +205,9 @@ class Snake {
           ctx.save();
           const centerX = x + cellSize / 2;
           const centerY = y + cellSize / 2;
-          const baseRadius = cellSize / 2 + 3;
-          const pulse = Math.sin(Date.now() * 0.01) * 2 + 1;
+          const baseRadius = Math.max(5, cellSize / 2 + 3); // Mindestens 5px
+          const pulse = Math.max(0.5, Math.sin(Date.now() * 0.01) * 0.3 + 1); // Zwischen 0.7 und 1.3
+          const radius = Math.max(1, baseRadius * pulse); // Sicherstellen dass Radius immer positiv ist
           
           // Äußerer Ring
           ctx.strokeStyle = '#FFD700';
@@ -214,22 +215,23 @@ class Snake {
           ctx.shadowBlur = 20;
           ctx.shadowColor = '#FFD700';
           ctx.beginPath();
-          ctx.arc(centerX, centerY, baseRadius * pulse, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
           ctx.stroke();
           
           // Innerer Ring
+          const innerRadius = Math.max(1, radius * 0.7); // Sicherstellen dass Radius immer positiv ist
           ctx.strokeStyle = '#FFA000';
           ctx.lineWidth = 2;
           ctx.shadowBlur = 10;
           ctx.beginPath();
-          ctx.arc(centerX, centerY, baseRadius * 0.7 * pulse, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
           ctx.stroke();
           
           // Glow-Partikel um Shield
           for (let i = 0; i < 8; i++) {
             const angle = (Math.PI * 2 * i) / 8 + Date.now() * 0.002;
-            const px = centerX + Math.cos(angle) * baseRadius * pulse;
-            const py = centerY + Math.sin(angle) * baseRadius * pulse;
+            const px = centerX + Math.cos(angle) * radius;
+            const py = centerY + Math.sin(angle) * radius;
             ctx.fillStyle = '#FFD700';
             ctx.shadowBlur = 8;
             ctx.beginPath();
