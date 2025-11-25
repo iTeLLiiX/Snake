@@ -35,14 +35,14 @@ class AnimationSystem {
         this.animateMicroInteraction(e.target, 'leave');
       });
       
-      // Touch Feedback
+      // Touch Feedback (passive für Performance)
       button.addEventListener('touchstart', (e) => {
         this.animateMicroInteraction(e.target, 'press');
-      });
+      }, { passive: true });
       
       button.addEventListener('touchend', (e) => {
         this.animateMicroInteraction(e.target, 'release');
-      });
+      }, { passive: true });
     });
   }
   

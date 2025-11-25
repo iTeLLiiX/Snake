@@ -119,6 +119,11 @@ class Game {
       const centerY = Math.floor(this.gridHeight / 2);
       this.snake.reset(centerX, centerY);
     }
+    
+    // Canvas sofort rendern (auch wenn Spiel nicht läuft)
+    if (this.background) {
+      this.render();
+    }
   }
   
   // Initialisierung
@@ -153,6 +158,9 @@ class Game {
       achievementSystem = new AchievementSystem();
       await achievementSystem.init();
     }
+    
+    // Initiales Rendering (damit Canvas sichtbar ist)
+    this.render();
   }
   
   // Assets laden
@@ -731,12 +739,26 @@ class Game {
   
   // Rendering (Optimiert für 60 FPS)
   render() {
+    // Prüfe ob Canvas existiert und gültige Größe hat
+    if (!this.canvas || !this.ctx || this.canvas.width === 0 || this.canvas.height === 0) {
+      return; // Canvas noch nicht initialisiert
+    }
+    
     // Clear Canvas (schnellste Methode)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
-    // Hintergrund zeichnen (zuerst, unter allem)
+    // Hintergrund zeichnen (zuerst, unter allem) - IMMER, auch wenn Spiel nicht läuft
     if (this.background) {
       this.background.render(this.ctx, this.gridWidth, this.gridHeight, this.cellSize);
+    } else {
+      // Fallback: Dunkler Hintergrund
+      this.ctx.fillStyle = '#0A0A0A';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    
+    // Nur Game-Elemente zeichnen wenn Spiel läuft
+    if (!this.isRunning) {
+      return;
     }
     
     // Screen Shake Transform anwenden

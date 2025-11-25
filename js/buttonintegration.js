@@ -100,14 +100,14 @@ class ButtonIntegration {
       drawButton('hover');
     });
     
-    // Touch-Events für Mobile
+    // Touch-Events für Mobile (passive für Performance)
     button.addEventListener('touchstart', () => {
       drawButton('pressed');
-    });
+    }, { passive: true });
     
     button.addEventListener('touchend', () => {
       drawButton('normal');
-    });
+    }, { passive: true });
   }
 }
 
