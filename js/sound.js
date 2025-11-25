@@ -30,7 +30,8 @@ class SoundManager {
       gameover: 'assets/sounds/effects/gameover.wav',
       levelup: 'assets/sounds/effects/levelup.wav',
       button: 'assets/sounds/effects/button.mp3',
-      bomb: 'assets/sounds/effects/bomb.flac'
+      bomb: 'assets/sounds/effects/bomb.flac',
+      cannabis: 'assets/sounds/effects/cannabis.wav' // Neuer Sound für Cannabis-Einsammeln
     };
     
     // Fallback: Versuche auch andere Formate

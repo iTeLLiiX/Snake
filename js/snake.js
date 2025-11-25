@@ -234,7 +234,7 @@ class Snake {
   }
   
   // Reset für neues Spiel
-  reset(x, y, initialLength = 3) {
+  reset(x, y, initialLength = 5) {
     this.body = [];
     for (let i = 0; i < initialLength; i++) {
       this.body.push({ x: x - i, y: y });
@@ -242,9 +242,10 @@ class Snake {
     this.direction = 'right';
     this.nextDirection = 'right';
     this.speed = 150;
-    this.lastMove = 0;
+    this.lastMove = this.speed; // Startet sofort mit Bewegung (statt 0)
     this.shield = false;
     this.speedMultiplier = 1;
+    this.interpolationFactor = 0;
   }
 }
 

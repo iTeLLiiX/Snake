@@ -276,7 +276,9 @@ class Game {
     const cappedDeltaTime = Math.min(deltaTime, 100);
     
     // Update (immer, für smooth Animationen)
-    this.update(cappedDeltaTime);
+    if (cappedDeltaTime > 0) {
+      this.update(cappedDeltaTime);
+    }
     
     // Render (immer, für 60 FPS)
     this.render();
@@ -416,7 +418,7 @@ class Game {
     } else if (this.food.type === 'special') {
       // Spezieller Effekt für Marijuana
       this.particles.burst(foodX, foodY, 'special', 20);
-      if (window.soundManager) window.soundManager.playSound('powerup');
+      if (window.soundManager) window.soundManager.playSound('cannabis'); // Neuer Cannabis-Sound!
     } else if (this.food.type === 'easter_egg') {
       // Mega-Bonus Effekt
       this.particles.explode(foodX, foodY, 'levelup', 25);
