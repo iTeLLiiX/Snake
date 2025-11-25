@@ -1,205 +1,208 @@
 /**
- * Controls System
- * Verwaltet Touch- und Keyboard-Steuerung
+ * Controls System - Fresh Build
+ * Keyboard (WASD + Arrow Keys) und Touch-Steuerung
  */
 
 class Controls {
   constructor(game) {
     this.game = game;
+    
+    // Touch-Steuerung
     this.startX = 0;
     this.startY = 0;
-    this.startTime = 0;
+    this.minSwipeDistance = 30;
+    this.controlType = 'swipe';
     
-    // Adaptive Swipe-Distanz basierend auf Bildschirmgröße
-    this.updateSwipeDistance();
-    
-    this.controlType = 'swipe'; // 'swipe' oder 'dpad'
-    
-    // Device-Erkennung
-    this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    // Swipe-Timeout (verhindert versehentliche Swipes)
-    this.swipeTimeout = 300; // ms
-    this.lastSwipeTime = 0;
+    // Keyboard State (verhindert Key-Repeat-Probleme)
+    this.keyState = {};
+    this.lastKeyTime = {};
     
     this.setupEvents();
-    
-    // Swipe-Distanz bei Resize aktualisieren
-    window.addEventListener('resize', () => this.updateSwipeDistance());
-    window.addEventListener('orientationchange', () => {
-      setTimeout(() => this.updateSwipeDistance(), 100);
-    });
-  }
-  
-  // Swipe-Distanz basierend auf Bildschirmgröße anpassen
-  updateSwipeDistance() {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const minDimension = Math.min(screenWidth, screenHeight);
-    
-    // Adaptive Distanz: 3-5% der kleineren Bildschirmdimension
-    this.minSwipeDistance = Math.max(20, Math.min(50, minDimension * 0.04));
-    
-    // Für sehr kleine Geräte: größere Distanz
-    if (minDimension < 400) {
-      this.minSwipeDistance = 25;
-    }
   }
   
   // Event-Listener einrichten
   setupEvents() {
+    // Keyboard Events - WICHTIG: Auf window, nicht auf canvas!
+    window.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    window.addEventListener('keyup', (e) => this.handleKeyUp(e));
+    
+    // Touch Events (nur auf Canvas)
     const canvas = this.game.canvas;
-    
-    // Touch Events
-    canvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-    canvas.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
-    canvas.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    
-    // Keyboard Events
-    window.addEventListener('keydown', this.handleKeyDown.bind(this));
+    if (canvas) {
+      canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+      canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+      canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+    }
     
     // D-Pad Buttons
     const dPadButtons = document.querySelectorAll('.d-pad-button');
     dPadButtons.forEach(button => {
       button.addEventListener('click', (e) => {
         const direction = e.target.dataset.direction;
-        this.handleDirection(direction);
+        if (direction) {
+          this.handleDirection(direction);
+        }
       });
     });
+  }
+  
+  // Keyboard Input - FRISCH & EINFACH
+  handleKeyDown(e) {
+    // Verhindere Key-Repeat (nur einmal pro Key-Press)
+    const now = Date.now();
+    if (this.lastKeyTime[e.key] && now - this.lastKeyTime[e.key] < 50) {
+      return; // Zu schnell, ignoriere
+    }
+    this.lastKeyTime[e.key] = now;
+    
+    // Prüfe ob Spiel läuft
+    if (!this.game || !this.game.isRunning || this.game.isPaused) {
+      return;
+    }
+    
+    // Prüfe ob Snake existiert
+    if (!this.game.snake) {
+      return;
+    }
+    
+    let direction = null;
+    
+    // WASD + Arrow Keys
+    switch (e.key.toLowerCase()) {
+      case 'w':
+      case 'arrowup':
+        e.preventDefault();
+        direction = 'up';
+        break;
+      case 's':
+      case 'arrowdown':
+        e.preventDefault();
+        direction = 'down';
+        break;
+      case 'a':
+      case 'arrowleft':
+        e.preventDefault();
+        direction = 'left';
+        break;
+      case 'd':
+      case 'arrowright':
+        e.preventDefault();
+        direction = 'right';
+        break;
+      case ' ':
+      case 'escape':
+        e.preventDefault();
+        if (this.game.isRunning) {
+          this.game.togglePause();
+        }
+        return;
+    }
+    
+    // Richtung ändern wenn gültig
+    if (direction) {
+      this.handleDirection(direction);
+    }
+  }
+  
+  // Key Up (für Key-State)
+  handleKeyUp(e) {
+    delete this.keyState[e.key];
+  }
+  
+  // Richtung verarbeiten - DIREKT & EINFACH
+  handleDirection(direction) {
+    // Prüfungen
+    if (!this.game) {
+      console.warn('Controls: Game nicht verfügbar');
+      return;
+    }
+    
+    if (!this.game.isRunning) {
+      console.warn('Controls: Spiel läuft nicht');
+      return;
+    }
+    
+    if (this.game.isPaused) {
+      console.warn('Controls: Spiel ist pausiert');
+      return;
+    }
+    
+    if (!this.game.snake) {
+      console.warn('Controls: Snake nicht verfügbar');
+      return;
+    }
+    
+    // DIREKT Richtung ändern
+    try {
+      this.game.snake.changeDirection(direction);
+    } catch (error) {
+      console.error('Controls: Fehler beim Richtungswechsel', error);
+    }
   }
   
   // Touch Start
   handleTouchStart(e) {
     if (this.controlType !== 'swipe') return;
+    if (e.target !== this.game.canvas) return;
     
-    // Verhindere Scroll nur auf Canvas
-    if (e.target === this.game.canvas) {
-      e.preventDefault();
-    }
-    
+    e.preventDefault();
     const touch = e.touches[0];
     this.startX = touch.clientX;
     this.startY = touch.clientY;
-    this.startTime = Date.now();
   }
   
-  // Touch Move (verhindert Scroll nur auf Canvas)
+  // Touch Move
   handleTouchMove(e) {
     if (this.controlType === 'swipe' && e.target === this.game.canvas) {
       e.preventDefault();
     }
   }
   
-  // Touch End (Swipe Detection) - Verbessert für alle Geräte
+  // Touch End (Swipe Detection)
   handleTouchEnd(e) {
     if (this.controlType !== 'swipe') return;
+    if (e.target !== this.game.canvas) return;
     
-    // Verhindere Scroll nur auf Canvas
-    if (e.target === this.game.canvas) {
-      e.preventDefault();
-    }
+    e.preventDefault();
     
     const touch = e.changedTouches[0];
     const endX = touch.clientX;
     const endY = touch.clientY;
-    const endTime = Date.now();
     
     const deltaX = endX - this.startX;
     const deltaY = endY - this.startY;
-    const deltaTime = endTime - this.startTime;
     
-    // Swipe-Geschwindigkeit (px/ms)
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    const velocity = distance / Math.max(deltaTime, 1);
-    
-    // Prüfe ob Swipe groß genug UND schnell genug (verhindert versehentliche Swipes)
-    if (distance < this.minSwipeDistance) {
-      return; // Zu klein, ignoriere
+    // Prüfe ob Swipe groß genug
+    if (Math.abs(deltaX) < this.minSwipeDistance && 
+        Math.abs(deltaY) < this.minSwipeDistance) {
+      return;
     }
     
-    // Prüfe Swipe-Timeout (verhindert zu schnelle Swipes)
-    if (endTime - this.lastSwipeTime < 100) {
-      return; // Zu schnell hintereinander
-    }
-    
-    // Prüfe minimale Geschwindigkeit (optional, für bessere Erkennung)
-    // if (velocity < 0.1) return; // Zu langsam
-    
-    // Bestimme Hauptrichtung (mit Winkel-Toleranz)
-    const absDeltaX = Math.abs(deltaX);
-    const absDeltaY = Math.abs(deltaY);
-    
-    // Mindestens 30% Unterschied für klare Richtung
-    if (absDeltaX > absDeltaY * 1.3) {
+    // Bestimme Hauptrichtung
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
       // Horizontal
       this.handleDirection(deltaX > 0 ? 'right' : 'left');
-      this.lastSwipeTime = endTime;
-    } else if (absDeltaY > absDeltaX * 1.3) {
+    } else {
       // Vertikal
       this.handleDirection(deltaY > 0 ? 'down' : 'up');
-      this.lastSwipeTime = endTime;
     }
-    // Sonst: Zu diagonal, ignoriere
-  }
-  
-  // Keyboard Input
-  handleKeyDown(e) {
-    switch (e.key) {
-      case 'ArrowUp':
-      case 'w':
-      case 'W':
-        e.preventDefault();
-        this.handleDirection('up');
-        break;
-      case 'ArrowDown':
-      case 's':
-      case 'S':
-        e.preventDefault();
-        this.handleDirection('down');
-        break;
-      case 'ArrowLeft':
-      case 'a':
-      case 'A':
-        e.preventDefault();
-        this.handleDirection('left');
-        break;
-      case 'ArrowRight':
-      case 'd':
-      case 'D':
-        e.preventDefault();
-        this.handleDirection('right');
-        break;
-      case ' ':
-      case 'Escape':
-        e.preventDefault();
-        if (this.game.isRunning) {
-          this.game.togglePause();
-        }
-        break;
-    }
-  }
-  
-  // Richtung verarbeiten
-  handleDirection(direction) {
-    if (!this.game.isRunning || this.game.isPaused) return;
-    this.game.snake.changeDirection(direction);
   }
   
   // Steuerungstyp ändern
   setControlType(type) {
     this.controlType = type;
     const dPad = document.getElementById('d-pad');
-    if (type === 'dpad') {
-      dPad.classList.remove('hidden');
-    } else {
-      dPad.classList.add('hidden');
+    if (dPad) {
+      if (type === 'dpad') {
+        dPad.classList.remove('hidden');
+      } else {
+        dPad.classList.add('hidden');
+      }
     }
   }
   
   // Cleanup
   destroy() {
-    // Event-Listener werden automatisch entfernt wenn Elemente gelöscht werden
+    // Event-Listener werden automatisch entfernt
   }
 }
-

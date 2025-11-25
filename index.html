@@ -50,6 +50,14 @@
           <span class="level-label">Level:</span>
           <span id="level-value" class="level-value"><canvas id="level-canvas"></canvas></span>
         </div>
+        <!-- Level Progress Bar -->
+        <div id="level-progress" class="level-progress hidden">
+          <div class="level-progress-label">Level Progress</div>
+          <div class="level-progress-bar-container">
+            <canvas id="level-progress-bar" class="level-progress-bar"></canvas>
+          </div>
+          <div id="level-progress-text" class="level-progress-text">0/10</div>
+        </div>
         <!-- Power-Up Timer Display -->
         <div id="powerup-display" class="powerup-display"></div>
         <!-- Combo Meter -->
@@ -175,6 +183,22 @@
         <div class="bento-item bento-item-wide glass">
           <button id="back-button" class="game-button morph-button">Zurück</button>
         </div>
+        
+        <!-- Achievements Section -->
+        <div class="bento-item bento-item-large glass">
+          <h3 class="expressive-text gradient-text">Achievements</h3>
+          <div id="achievements-grid" class="achievement-grid">
+            <!-- Wird dynamisch gefüllt -->
+          </div>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="bento-item bento-item-large glass">
+          <h3 class="expressive-text gradient-text">Statistiken</h3>
+          <div id="statistics-grid" class="statistics-grid">
+            <!-- Wird dynamisch gefüllt -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -193,6 +217,12 @@
   <script src="js/utils.js"></script>
   <script src="js/numberdisplay.js"></script>
   <script src="js/sound.js"></script>
+  <script src="js/buttonassets.js"></script>
+  <script src="js/uiassets.js"></script>
+  <script src="js/buttonintegration.js"></script>
+  <script src="js/statistics.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/walls.js"></script>
   <script src="js/snake.js"></script>
   <script src="js/food.js"></script>
   <script src="js/powerups.js"></script>

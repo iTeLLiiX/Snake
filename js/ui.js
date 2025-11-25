@@ -57,6 +57,12 @@ class UIManager {
         window.animationSystem.createRipple(e, settingsButton);
       }
       this.showScreen('settings', 'slide');
+      // Achievements und Statistics laden
+      setTimeout(() => {
+        this.displayAchievements();
+        this.displayStatistics();
+        this.integrateCheckBoxes();
+      }, 100);
     });
     
     // Game Over Screen
@@ -227,6 +233,47 @@ class UIManager {
     }
   }
   
+  // Level-Progress aktualisieren
+  updateLevelProgress(itemsEaten, itemsNeeded, level) {
+    const progressContainer = document.getElementById('level-progress');
+    const progressBar = document.getElementById('level-progress-bar');
+    const progressText = document.getElementById('level-progress-text');
+    
+    if (!progressContainer || !progressBar || !progressText) return;
+    
+    // Zeige Progress-Bar wenn Level-Up naht (letzte 5 Items)
+    if (itemsEaten >= itemsNeeded - 5) {
+      progressContainer.classList.remove('hidden');
+      
+      const progress = Math.min(1, itemsEaten / itemsNeeded);
+      const canvas = progressBar;
+      const ctx = canvas.getContext('2d');
+      
+      // Canvas-Größe
+      canvas.width = 200;
+      canvas.height = 20;
+      
+      // Zeichne Progress-Bar mit Asset
+      if (uiAssetsManager && uiAssetsManager.loaded) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const variant = Math.min(5, Math.max(1, Math.ceil(progress * 5)));
+        uiAssetsManager.drawProgressBar(ctx, 0, 0, canvas.width, canvas.height, progress, variant);
+      } else {
+        // Fallback
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillRect(0, 0, canvas.width * progress, canvas.height);
+        ctx.strokeStyle = '#2E7D32';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      // Text aktualisieren
+      progressText.textContent = `${itemsEaten}/${itemsNeeded}`;
+    } else {
+      progressContainer.classList.add('hidden');
+    }
+  }
+  
   // Power-Up Display aktualisieren
   updatePowerUpDisplay(activePowerUps) {
     const display = document.getElementById('powerup-display');
@@ -242,22 +289,69 @@ class UIManager {
       icon.className = `powerup-icon powerup-${powerUp.type}`;
       
       // Symbol für Power-Up
-      let symbol = '⚡';
+      // Verwende Icon-Assets statt Emojis
+      let iconPath = null;
       switch (powerUp.type) {
         case PowerUpTypes.SPEED_BOOST:
-          symbol = '⚡';
+          iconPath = 'assets/images/ui/icons/Icon01.png';
           break;
         case PowerUpTypes.SLOW_MOTION:
-          symbol = '⏱';
+          iconPath = 'assets/images/ui/icons/Icon02.png';
           break;
         case PowerUpTypes.SHIELD:
-          symbol = '🛡';
+          iconPath = 'assets/images/ui/icons/Icon03.png';
           break;
         case PowerUpTypes.SCORE_MULTIPLIER:
-          symbol = '✕';
+          iconPath = 'assets/images/ui/icons/Icon04.png';
           break;
       }
-      icon.textContent = symbol;
+      
+      if (iconPath) {
+        const iconImg = document.createElement('img');
+        iconImg.src = iconPath;
+        iconImg.alt = powerUp.type;
+        iconImg.style.width = '100%';
+        iconImg.style.height = '100%';
+        iconImg.style.objectFit = 'contain';
+        iconImg.onerror = () => {
+          // Fallback: Emoji
+          let symbol = '⚡';
+          switch (powerUp.type) {
+            case PowerUpTypes.SPEED_BOOST:
+              symbol = '⚡';
+              break;
+            case PowerUpTypes.SLOW_MOTION:
+              symbol = '⏱';
+              break;
+            case PowerUpTypes.SHIELD:
+              symbol = '🛡';
+              break;
+            case PowerUpTypes.SCORE_MULTIPLIER:
+              symbol = '✕';
+              break;
+          }
+          icon.textContent = symbol;
+        };
+        icon.appendChild(iconImg);
+      } else {
+        // Fallback: Emoji
+        let symbol = '⚡';
+        switch (powerUp.type) {
+          case PowerUpTypes.SPEED_BOOST:
+            symbol = '⚡';
+            break;
+          case PowerUpTypes.SLOW_MOTION:
+            symbol = '⏱';
+            break;
+          case PowerUpTypes.SHIELD:
+            symbol = '🛡';
+            break;
+          case PowerUpTypes.SCORE_MULTIPLIER:
+            symbol = '✕';
+            break;
+        }
+        icon.textContent = symbol;
+      }
       
       const timer = document.createElement('div');
       timer.className = 'powerup-timer';
@@ -394,6 +488,132 @@ class UIManager {
       return true; // Neuer Highscore!
     }
     return false;
+  }
+  
+  // Achievements anzeigen (Settings)
+  displayAchievements() {
+    if (!achievementSystem || !achievementSystem.loaded) return;
+    
+    const grid = document.getElementById('achievements-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    const achievements = achievementSystem.getAll();
+    achievements.forEach(achievement => {
+      const item = document.createElement('div');
+      item.className = `achievement-item ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+      
+      const icon = document.createElement('div');
+      icon.className = 'achievement-item-icon';
+      if (achievementSystem.iconImages[achievement.iconId]) {
+        const img = document.createElement('img');
+        img.src = achievementSystem.iconImages[achievement.iconId].src;
+        img.alt = achievement.name;
+        icon.appendChild(img);
+      } else {
+        icon.innerHTML = '<div class="achievement-icon-fallback">🏆</div>';
+      }
+      
+      const name = document.createElement('div');
+      name.className = 'achievement-item-name';
+      name.textContent = achievement.name;
+      
+      const progress = document.createElement('div');
+      progress.className = 'achievement-item-progress';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'achievement-item-progress-bar';
+      progressBar.style.width = `${achievement.getProgressPercent()}%`;
+      progress.appendChild(progressBar);
+      
+      item.appendChild(icon);
+      item.appendChild(name);
+      if (!achievement.unlocked) {
+        item.appendChild(progress);
+      }
+      
+      grid.appendChild(item);
+    });
+  }
+  
+  // Statistics anzeigen (Settings)
+  displayStatistics() {
+    if (!statistics) return;
+    
+    const grid = document.getElementById('statistics-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    const stats = statistics.getAll();
+    const statItems = [
+      { label: 'Gespielte Spiele', value: stats.totalGames },
+      { label: 'Items gefressen', value: statistics.formatNumber(stats.totalItemsEaten) },
+      { label: 'Gesamt-Score', value: statistics.formatNumber(stats.totalScore) },
+      { label: 'Ø Score', value: Math.floor(stats.averageScore) },
+      { label: 'Bestes Level', value: stats.bestLevel },
+      { label: 'Spielzeit', value: statistics.formatTime(stats.totalPlayTime) },
+      { label: 'Längste Combo', value: stats.bestCombo },
+      { label: 'Power-Ups', value: statistics.formatNumber(stats.totalPowerUpsCollected) }
+    ];
+    
+    statItems.forEach(item => {
+      const statItem = document.createElement('div');
+      statItem.className = 'stat-item';
+      
+      const label = document.createElement('div');
+      label.className = 'stat-label';
+      label.textContent = item.label;
+      
+      const value = document.createElement('div');
+      value.className = 'stat-value';
+      value.textContent = item.value;
+      
+      statItem.appendChild(label);
+      statItem.appendChild(value);
+      grid.appendChild(statItem);
+    });
+  }
+  
+  // CheckBoxes mit Assets integrieren
+  integrateCheckBoxes() {
+    if (!uiAssetsManager || !uiAssetsManager.loaded) return;
+    
+    // Sound Toggle
+    const soundToggle = document.getElementById('sound-toggle');
+    if (soundToggle) {
+      const label = soundToggle.parentElement;
+      const newCheckBox = uiAssetsManager.createCheckBox('sound-toggle', soundToggle.checked, (checked) => {
+        soundToggle.checked = checked;
+        if (window.soundManager) {
+          window.soundManager.setSoundEnabled(checked);
+        }
+      });
+      label.innerHTML = '';
+      label.appendChild(newCheckBox);
+      const text = document.createElement('span');
+      text.textContent = '🔊 Sound';
+      text.style.marginLeft = '10px';
+      label.appendChild(text);
+    }
+    
+    // Music Toggle
+    const musicToggle = document.getElementById('music-toggle');
+    if (musicToggle) {
+      const label = musicToggle.parentElement;
+      const newCheckBox = uiAssetsManager.createCheckBox('music-toggle', musicToggle.checked, (checked) => {
+        musicToggle.checked = checked;
+        if (window.soundManager) {
+          window.soundManager.setMusicEnabled(checked);
+        }
+      });
+      label.innerHTML = '';
+      label.appendChild(newCheckBox);
+      const text = document.createElement('span');
+      text.textContent = '🎵 Musik';
+      text.style.marginLeft = '10px';
+      label.appendChild(text);
+    }
   }
   
 }

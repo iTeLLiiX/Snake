@@ -1,0 +1,42 @@
+# 📦 ASSETS ZUM HOCHLADEN - Exakte Pfade
+
+## ✅ MINIMAL BENÖTIGT (7 Dateien)
+
+Kopiere diese Dateien in dein GitHub Repository:
+
+assets/images/snake/snake_green_head.png
+assets/images/snake/snake_green_blob.png
+assets/images/food/apple_green.png
+assets/images/food/Marijuana.png
+assets/images/food/bomb.png
+assets/images/logo/weedgame.png
+assets/images/ui/messages/Msg01.png
+
+## 📂 ORDNERSTRUKTUR ERSTELLEN
+
+Erstelle diese Ordner in deinem GitHub Repository:
+
+assets/
+  images/
+    snake/
+    food/
+    logo/
+    ui/
+      messages/
+
+## 🚀 ALTERNATIVE: ALLES HOCHLADEN
+
+Falls du alle Assets hochladen willst (empfohlen für zukünftige Features):
+
+Lade den KOMPLETTEN assets/ Ordner hoch:
+- assets/images/snake/ (alle Dateien)
+- assets/images/food/ (alle Dateien)
+- assets/images/logo/ (alle Dateien)
+- assets/images/ui/ (alle Unterordner)
+
+## ⚠️ WICHTIG
+
+- Verwende die ORIGINAL-Größen (ohne _32 oder _64)
+- Behalte die Ordnerstruktur bei
+- Alle Pfade müssen relativ sein (wie oben)
+

@@ -23,6 +23,7 @@ class Game {
     this.food = null;
     this.powerUpItem = null; // Power-Up als Item auf Spielfeld
     this.powerUpManager = null;
+    this.wallSystem = null; // Wall System
     this.particles = new ParticleSystem();
     this.trails = new TrailSystem();
     this.effects = new VisualEffects(this.canvas);
@@ -48,6 +49,8 @@ class Game {
     this.startTime = 0;
     this.gameTime = 0;
     this.powerUpsCollected = 0;
+    this.shieldsUsed = 0; // Für Achievement
+    this.currentBombsEaten = 0; // Für Achievement "Perfekt"
     this.foodTypesEaten = {
       normal: 0,
       apple_red: 0,
@@ -128,6 +131,7 @@ class Game {
     this.food = new Food();
     this.powerUpItem = new PowerUpItem();
     this.powerUpManager = new PowerUpManager();
+    this.wallSystem = new WallSystem();
     
     // Assets laden
     await this.loadAssets();
@@ -138,6 +142,17 @@ class Game {
     
     // Highscore laden
     this.highscore = Storage.get('highscore', 0);
+    
+    // Statistics initialisieren
+    if (!statistics) {
+      statistics = new Statistics();
+    }
+    
+    // Achievement System initialisieren
+    if (!achievementSystem) {
+      achievementSystem = new AchievementSystem();
+      await achievementSystem.init();
+    }
   }
   
   // Assets laden
@@ -146,7 +161,8 @@ class Game {
       await Promise.all([
         this.snake.loadAssets(),
         this.food.loadAssets(),
-        this.powerUpItem.loadAssets()
+        this.powerUpItem.loadAssets(),
+        this.wallSystem.init()
       ]);
     } catch (error) {
       console.error('Fehler beim Laden der Assets:', error);
@@ -167,6 +183,8 @@ class Game {
     this.startTime = Date.now();
     this.gameTime = 0;
     this.powerUpsCollected = 0;
+    this.shieldsUsed = 0;
+    this.currentBombsEaten = 0;
     this.foodTypesEaten = {
       normal: 0,
       apple_red: 0,
@@ -175,6 +193,11 @@ class Game {
       oliebol: 0,
       bomb: 0
     };
+    
+    // Walls zurücksetzen
+    if (this.wallSystem) {
+      this.wallSystem.reset();
+    }
     
     // Snake positionieren
     const centerX = Math.floor(this.gridWidth / 2);
@@ -319,9 +342,26 @@ class Game {
     this.snake.update(deltaTime);
     
     // Kollisionsprüfung (früh prüfen für Performance)
-    if (this.snake.checkCollision(this.gridWidth, this.gridHeight)) {
-      this.gameOver();
-      return;
+    const hasCollision = this.snake.checkCollision(this.gridWidth, this.gridHeight);
+    const hasWallCollision = this.wallSystem && this.wallSystem.checkCollision(this.snake.body[0]);
+    
+    if (hasCollision || hasWallCollision) {
+      if (this.snake.shield) {
+        // Shield wurde verwendet
+        this.shieldsUsed++;
+        this.snake.shield = false;
+        this.powerUpManager.activePowerUps = this.powerUpManager.activePowerUps.filter(
+          p => p.type !== PowerUpTypes.SHIELD
+        );
+        // Partikel-Effekt
+        const head = this.snake.body[0];
+        const headX = head.x * this.cellSize + this.cellSize / 2;
+        const headY = head.y * this.cellSize + this.cellSize / 2;
+        this.particles.burst(headX, headY, 'powerup', 15);
+      } else {
+        this.gameOver();
+        return;
+      }
     }
     
     // Food-Kollision
@@ -441,6 +481,7 @@ class Game {
     if (this.food.type === 'bomb') {
       // Explosion bei Bomb
       this.particles.explode(foodX, foodY, 'bomb', 15);
+      this.currentBombsEaten++; // Für Achievement "Perfekt"
       if (window.soundManager) window.soundManager.playSound('bomb');
     } else if (this.food.type === 'special') {
       // Spezieller Effekt für Marijuana - NUR Smoke Sound
@@ -488,9 +529,9 @@ class Game {
       this.maxCombo = this.combo;
     }
     
-    // Combo-Bonus bei hohen Combos
-    if (this.combo > 1) {
-      const comboBonus = Math.floor(this.combo / 2) * 5; // Bonus-Punkte
+    // Combo-Bonus bei hohen Combos (nur 1 Bonus-Punkt ab Combo 3)
+    if (this.combo >= 3) {
+      const comboBonus = 1; // Nur 1 Bonus-Punkt pro Combo ab 3
       this.score += comboBonus;
       
       // Partikel-Effekt bei hohen Combos
@@ -519,6 +560,10 @@ class Game {
     if (window.ui) {
       window.ui.updateScore(this.score);
       window.ui.updateLevel(this.level);
+      
+      // Level-Progress aktualisieren
+      const itemsNeeded = 10 + (this.level - 1) * 5;
+      window.ui.updateLevelProgress(this.itemsEaten, itemsNeeded, this.level);
     }
   }
   
@@ -582,6 +627,18 @@ class Game {
         window.ui.showLevelUpAnimation(this.level);
       }
       
+      // Wände spawnen ab Level 5
+      if (this.wallSystem && this.level >= 5) {
+        this.wallSystem.spawnWalls(
+          this.level,
+          this.gridWidth,
+          this.gridHeight,
+          this.snake.body,
+          this.food.position,
+          this.powerUpItem.spawned ? this.powerUpItem.position : null
+        );
+      }
+      
       return true;
     }
     return false;
@@ -626,9 +683,35 @@ class Game {
           gameTime: Math.floor(this.gameTime / 1000), // Sekunden
           powerUpsCollected: this.powerUpsCollected,
           foodTypesEaten: this.foodTypesEaten,
-          averageScorePerItem: this.itemsEaten > 0 ? Math.floor(this.score / this.itemsEaten) : 0
+          averageScorePerItem: this.itemsEaten > 0 ? Math.floor(this.score / this.itemsEaten) : 0,
+          snakeLength: this.snake.body.length,
+          shieldsUsed: this.shieldsUsed,
+          currentBombsEaten: this.currentBombsEaten
         };
         window.ui.showGameOver(stats, isNewHighscore);
+        
+        // Statistics aktualisieren
+        if (statistics) {
+          statistics.updateFromGame(stats);
+        }
+        
+        // Achievements prüfen
+        if (achievementSystem) {
+          const achievementStats = {
+            score: this.score,
+            highscore: this.highscore,
+            level: this.level,
+            itemsEaten: this.itemsEaten,
+            maxCombo: this.maxCombo,
+            gameTime: this.gameTime,
+            totalItemsEaten: statistics ? statistics.stats.totalItemsEaten : 0,
+            totalMarijuanaEaten: statistics ? statistics.stats.totalMarijuanaEaten : 0,
+            totalShieldsUsed: statistics ? statistics.stats.totalShieldsUsed : 0,
+            currentBombsEaten: this.currentBombsEaten,
+            foodTypesEaten: this.foodTypesEaten
+          };
+          achievementSystem.checkAchievements(achievementStats);
+        }
       }
     }, 800);
   }
@@ -669,6 +752,11 @@ class Game {
     // Trails zeichnen (unter allem)
     if (this.trails.trails.length > 0) {
       this.trails.draw(this.ctx);
+    }
+    
+    // Wände zeichnen (vor Food, damit Food darüber ist)
+    if (this.wallSystem) {
+      this.wallSystem.draw(this.ctx, this.cellSize);
     }
     
     // Food zeichnen

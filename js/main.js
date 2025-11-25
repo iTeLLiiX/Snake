@@ -21,11 +21,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     await soundManager.loadSounds();
     window.soundManager = soundManager; // Global verfügbar
     
+    // Statistics initialisieren
+    statistics = new Statistics();
+    window.statistics = statistics; // Global verfügbar
+    
+    // Achievement System initialisieren
+    achievementSystem = new AchievementSystem();
+    await achievementSystem.init();
+    window.achievementSystem = achievementSystem; // Global verfügbar
+    
+    // Button Assets Manager initialisieren
+    buttonAssetManager = new ButtonAssetManager();
+    await buttonAssetManager.loadAssets();
+    window.buttonAssetManager = buttonAssetManager; // Global verfügbar
+    
+    // UI Assets Manager initialisieren
+    uiAssetsManager = new UIAssetsManager();
+    await uiAssetsManager.init();
+    window.uiAssetsManager = uiAssetsManager; // Global verfügbar
+    
+    // Button Integration initialisieren
+    buttonIntegration = new ButtonIntegration();
+    await buttonIntegration.integrateButtons();
+    window.buttonIntegration = buttonIntegration; // Global verfügbar
+    
     // UI Manager initialisieren (lädt Number-Sprites)
     ui = new UIManager();
     window.ui = ui; // Global verfügbar
     // Warte auf Number-Sprites Laden
     await ui.initNumberDisplay();
+    
+    // Button-Integration nach UI-Initialisierung
+    if (buttonIntegration) {
+      await buttonIntegration.integrateButtons();
+    }
     
     // Game initialisieren
     game = new Game();

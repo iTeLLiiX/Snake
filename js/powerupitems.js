@@ -17,13 +17,13 @@ class PowerUpItem {
   async loadAssets() {
     // Verwende Icons aus UI-Assets
     try {
-      // Für jetzt verwenden wir einfache Farben, später können Icons geladen werden
-      // this.assets.speed_boost = await loadImage('assets/images/ui/icons/Icon01.png');
-      // this.assets.slow_motion = await loadImage('assets/images/ui/icons/Icon02.png');
-      // this.assets.shield = await loadImage('assets/images/ui/icons/Icon03.png');
-      // this.assets.score_multiplier = await loadImage('assets/images/ui/icons/Icon04.png');
+      this.assets.speed_boost = await loadImage('assets/images/ui/icons/Icon01.png');
+      this.assets.slow_motion = await loadImage('assets/images/ui/icons/Icon02.png');
+      this.assets.shield = await loadImage('assets/images/ui/icons/Icon03.png');
+      this.assets.score_multiplier = await loadImage('assets/images/ui/icons/Icon04.png');
     } catch (error) {
-      console.warn('Power-Up Item assets nicht geladen:', error);
+      console.warn('Power-Up Item assets nicht geladen, verwende Fallback:', error);
+      // Fallback: Assets bleiben null, wird in draw() gehandhabt
     }
   }
   
@@ -209,28 +209,50 @@ class PowerUpItem {
     ctx.stroke();
     
     // Icon oder Symbol in der Mitte
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = `${pulseSize * 0.4}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    let symbol = '⚡';
+    let icon = null;
     switch (this.type) {
       case PowerUpTypes.SPEED_BOOST:
-        symbol = '⚡';
+        icon = this.assets.speed_boost;
         break;
       case PowerUpTypes.SLOW_MOTION:
-        symbol = '⏱';
+        icon = this.assets.slow_motion;
         break;
       case PowerUpTypes.SHIELD:
-        symbol = '🛡';
+        icon = this.assets.shield;
         break;
       case PowerUpTypes.SCORE_MULTIPLIER:
-        symbol = '✕';
+        icon = this.assets.score_multiplier;
         break;
     }
     
-    ctx.fillText(symbol, 0, 0);
+    if (icon) {
+      // Zeichne Icon-Asset
+      const iconSize = diamondSize * 0.6;
+      ctx.drawImage(icon, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+    } else {
+      // Fallback: Emoji
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `${pulseSize * 0.4}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      let symbol = '⚡';
+      switch (this.type) {
+        case PowerUpTypes.SPEED_BOOST:
+          symbol = '⚡';
+          break;
+        case PowerUpTypes.SLOW_MOTION:
+          symbol = '⏱';
+          break;
+        case PowerUpTypes.SHIELD:
+          symbol = '🛡';
+          break;
+        case PowerUpTypes.SCORE_MULTIPLIER:
+          symbol = '✕';
+          break;
+      }
+      ctx.fillText(symbol, 0, 0);
+    }
     
     ctx.restore();
   }

@@ -77,19 +77,19 @@ class Food {
   getPoints() {
     switch (this.type) {
       case 'normal':
-        return 10;
+        return 1; // 1 Punkt pro Item
       case 'apple_red':
-        return 15; // Mehr als grüner Apfel
+        return 1; // 1 Punkt (gleich wie normal)
       case 'special':
-        return 50; // Marijuana gibt mehr Punkte!
+        return 2; // Marijuana gibt 2 Punkte
       case 'easter_egg':
-        return 100; // Mega-Bonus!
+        return 5; // Easter Egg gibt 5 Punkte (Bonus)
       case 'oliebol':
-        return 20; // Bonus + Heilung
+        return 1; // 1 Punkt + Heilung
       case 'bomb':
-        return -100; // Negativ!
+        return -1; // -1 Punkt (negativ)
       default:
-        return 10;
+        return 1;
     }
   }
   
