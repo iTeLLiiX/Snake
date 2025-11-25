@@ -3,8 +3,8 @@
  * Ermöglicht Offline-Funktionalität und schnelles Laden
  */
 
-const CACHE_NAME = 'lucas-snake-adventure-v1.0.0';
-const RUNTIME_CACHE = 'lucas-snake-runtime-v1';
+const CACHE_NAME = 'lucas-snake-adventure-v1.0.1';
+const RUNTIME_CACHE = 'lucas-snake-runtime-v1.0.1';
 
 // Assets die gecacht werden sollen
 const STATIC_ASSETS = [
@@ -27,6 +27,13 @@ const STATIC_ASSETS = [
   '/js/sound.js',
   '/js/numberdisplay.js',
   '/js/utils.js',
+  '/js/animations.js',
+  '/js/buttonassets.js',
+  '/js/buttonintegration.js',
+  '/js/uiassets.js',
+  '/js/achievements.js',
+  '/js/statistics.js',
+  '/js/walls.js',
   '/manifest.json',
   '/assets/images/logo/weedgame.png'
 ];
