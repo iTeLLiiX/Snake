@@ -9,6 +9,9 @@ class SoundManager {
     this.music = null;
     this.musicVolume = 0.5;
     this.soundVolume = 0.7;
+    
+    // Cannabis-Sound spezielle Lautstärke (kann lauter sein)
+    this.cannabisSoundVolume = 0.8;
     this.musicEnabled = true;
     this.soundsEnabled = true;
     this.musicPlaying = false;
@@ -85,7 +88,19 @@ class SoundManager {
       try {
         // Erstelle neue Instanz für gleichzeitiges Abspielen
         const audio = sound.cloneNode();
-        audio.volume = this.soundVolume;
+        
+        // Spezielle Lautstärke für Cannabis-Sound
+        if (soundName === 'cannabis') {
+          audio.volume = this.cannabisSoundVolume;
+        } else {
+          audio.volume = this.soundVolume;
+        }
+        
+        // Audio-Context aktivieren (für bessere Kompatibilität)
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+          this.audioContext.resume();
+        }
+        
         audio.play().catch(e => {
           // Ignoriere Fehler (z.B. wenn User noch nicht interagiert hat)
           console.debug('Sound konnte nicht abgespielt werden:', e);

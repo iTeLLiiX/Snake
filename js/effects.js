@@ -67,50 +67,79 @@ class VisualEffects {
     }
   }
   
-  // Bloom-Effekt (Glow)
+  // Bloom-Effekt (Glow) - Premium Version
   applyBloom(sourceCtx, sourceCanvas) {
     // Kopiere auf Bloom-Canvas
     this.bloomCtx.clearRect(0, 0, this.bloomCanvas.width, this.bloomCanvas.height);
     this.bloomCtx.drawImage(sourceCanvas, 0, 0);
     
-    // Glow-Effekt durch Blur
+    // Mehrschichtiger Glow-Effekt
     this.bloomCtx.globalCompositeOperation = 'screen';
-    this.bloomCtx.filter = 'blur(10px)';
+    
+    // Layer 1: Starker Blur
+    this.bloomCtx.filter = 'blur(20px) brightness(1.5)';
     this.bloomCtx.drawImage(sourceCanvas, 0, 0);
+    
+    // Layer 2: Mittlerer Blur
+    this.bloomCtx.filter = 'blur(10px) brightness(1.3)';
+    this.bloomCtx.globalAlpha = 0.6;
+    this.bloomCtx.drawImage(sourceCanvas, 0, 0);
+    
+    // Layer 3: Leichter Blur
+    this.bloomCtx.filter = 'blur(5px) brightness(1.2)';
+    this.bloomCtx.globalAlpha = 0.4;
+    this.bloomCtx.drawImage(sourceCanvas, 0, 0);
+    
+    // Reset
     this.bloomCtx.filter = 'none';
     this.bloomCtx.globalCompositeOperation = 'source-over';
+    this.bloomCtx.globalAlpha = 1.0;
     
-    // Kombiniere mit Original
-    sourceCtx.globalAlpha = 0.3;
+    // Kombiniere mit Original (Premium Blend)
+    sourceCtx.globalCompositeOperation = 'screen';
+    sourceCtx.globalAlpha = 0.4;
     sourceCtx.drawImage(this.bloomCanvas, 0, 0);
+    sourceCtx.globalCompositeOperation = 'source-over';
     sourceCtx.globalAlpha = 1.0;
   }
   
-  // Motion Blur
+  // Motion Blur - Premium Version
   addMotionBlurFrame(canvas) {
+    // Erstelle Kopie des Canvas
+    const frameCanvas = document.createElement('canvas');
+    frameCanvas.width = canvas.width;
+    frameCanvas.height = canvas.height;
+    const frameCtx = frameCanvas.getContext('2d');
+    frameCtx.drawImage(canvas, 0, 0);
+    
     this.motionBlurFrames.push({
-      image: canvas,
-      alpha: 0.3
+      image: frameCanvas,
+      alpha: 0.5,
+      timestamp: Date.now()
     });
     
     if (this.motionBlurFrames.length > this.maxMotionBlurFrames) {
       this.motionBlurFrames.shift();
     }
     
-    // Alpha reduzieren
+    // Alpha reduzieren (smooth fade)
     this.motionBlurFrames.forEach(frame => {
-      frame.alpha *= 0.8;
+      frame.alpha *= 0.75;
     });
   }
   
   drawMotionBlur(ctx) {
-    this.motionBlurFrames.forEach(frame => {
+    // Zeichne Frames von hinten nach vorne für besseren Effekt
+    for (let i = this.motionBlurFrames.length - 1; i >= 0; i--) {
+      const frame = this.motionBlurFrames[i];
       if (frame.alpha > 0.01) {
         ctx.globalAlpha = frame.alpha;
+        ctx.globalCompositeOperation = 'screen';
         ctx.drawImage(frame.image, 0, 0);
       }
-    });
+    }
     ctx.globalAlpha = 1.0;
+    ctx.globalCompositeOperation = 'source-over';
   }
   
   // Chromatic Aberration
@@ -133,12 +162,31 @@ class VisualEffects {
     ctx.putImageData(imageData, 0, 0);
   }
   
-  // Screen Flash zeichnen
+  // Screen Flash zeichnen - Premium Version
   drawFlash(ctx) {
     if (this.flashAlpha > 0) {
-      ctx.fillStyle = this.flashColor;
-      ctx.globalAlpha = this.flashAlpha * 0.3;
+      // Radialer Flash-Effekt
+      const gradient = ctx.createRadialGradient(
+        this.canvas.width / 2,
+        this.canvas.height / 2,
+        0,
+        this.canvas.width / 2,
+        this.canvas.height / 2,
+        Math.max(this.canvas.width, this.canvas.height) * 0.7
+      );
+      gradient.addColorStop(0, this.flashColor);
+      gradient.addColorStop(0.5, this.flashColor + '80');
+      gradient.addColorStop(1, 'transparent');
+      
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = this.flashAlpha * 0.5;
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      // Zusätzlicher Screen-Fill für intensiveren Effekt
+      ctx.fillStyle = this.flashColor;
+      ctx.globalAlpha = this.flashAlpha * 0.2;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
       ctx.globalAlpha = 1.0;
     }
   }

@@ -110,21 +110,18 @@ class Snake {
   checkCollision(gridWidth, gridHeight) {
     const head = this.body[0];
     
-    // Wenn Shield aktiv, keine Kollision
-    if (this.shield) {
-      return false;
-    }
-    
-    // Wand-Kollision
+    // Wand-Kollision (Shield schützt NICHT vor Wänden!)
     if (head.x < 0 || head.x >= gridWidth || 
         head.y < 0 || head.y >= gridHeight) {
       return true;
     }
     
-    // Selbst-Kollision
-    for (let i = 1; i < this.body.length; i++) {
-      if (head.x === this.body[i].x && head.y === this.body[i].y) {
-        return true;
+    // Selbst-Kollision (Shield schützt nur vor Selbst-Kollision)
+    if (!this.shield) {
+      for (let i = 1; i < this.body.length; i++) {
+        if (head.x === this.body[i].x && head.y === this.body[i].y) {
+          return true;
+        }
       }
     }
     
@@ -153,16 +150,23 @@ class Snake {
       const y = segment.y * cellSize;
       
       if (index === 0) {
-        // Kopf mit Glow-Effekt
+        // Kopf mit Premium Glow-Effekt
         ctx.save();
         
-        // Glow-Effekt für Shield
+        // Premium Glow-Effekt für Shield
         if (this.shield) {
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = 25;
           ctx.shadowColor = '#FFD700';
+          // Zusätzlicher Puls-Effekt
+          const pulse = Math.sin(Date.now() * 0.01) * 0.2 + 1;
+          ctx.shadowBlur *= pulse;
         } else {
-          ctx.shadowBlur = 5;
+          // Premium Glow für normale Snake
+          ctx.shadowBlur = 15;
           ctx.shadowColor = '#4CAF50';
+          // Leichter Puls
+          const pulse = Math.sin(Date.now() * 0.005) * 0.1 + 1;
+          ctx.shadowBlur *= pulse;
         }
         
         if (this.headImage) {
@@ -196,16 +200,43 @@ class Snake {
         
         ctx.restore();
         
-        // Shield-Effekt (Ring)
+        // Premium Shield-Effekt (mehrschichtiger Ring)
         if (this.shield) {
           ctx.save();
+          const centerX = x + cellSize / 2;
+          const centerY = y + cellSize / 2;
+          const baseRadius = cellSize / 2 + 3;
+          const pulse = Math.sin(Date.now() * 0.01) * 2 + 1;
+          
+          // Äußerer Ring
           ctx.strokeStyle = '#FFD700';
-          ctx.lineWidth = 3;
-          ctx.shadowBlur = 10;
+          ctx.lineWidth = 4;
+          ctx.shadowBlur = 20;
           ctx.shadowColor = '#FFD700';
           ctx.beginPath();
-          ctx.arc(x + cellSize / 2, y + cellSize / 2, cellSize / 2 + 3, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, baseRadius * pulse, 0, Math.PI * 2);
           ctx.stroke();
+          
+          // Innerer Ring
+          ctx.strokeStyle = '#FFA000';
+          ctx.lineWidth = 2;
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, baseRadius * 0.7 * pulse, 0, Math.PI * 2);
+          ctx.stroke();
+          
+          // Glow-Partikel um Shield
+          for (let i = 0; i < 8; i++) {
+            const angle = (Math.PI * 2 * i) / 8 + Date.now() * 0.002;
+            const px = centerX + Math.cos(angle) * baseRadius * pulse;
+            const py = centerY + Math.sin(angle) * baseRadius * pulse;
+            ctx.fillStyle = '#FFD700';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(px, py, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          
           ctx.restore();
         }
       } else {

@@ -75,25 +75,74 @@ class Particle {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation);
     
+    // Premium Glow-Effekt für alle Partikel
+    ctx.shadowBlur = this.size * 2;
+    ctx.shadowColor = this.color;
+    
     // Verschiedene Formen je nach Typ
     switch (this.type) {
       case 'levelup':
-        // Stern
+        // Stern mit Glow
         this.drawStar(ctx, 0, 0, this.size, this.size * 0.5, 5);
         break;
       case 'powerup':
-        // Glitzer
+        // Glitzer mit Glow
         this.drawSparkle(ctx, 0, 0, this.size);
         break;
+      case 'special':
+        // Cannabis-Partikel: Grün mit Glow
+        this.drawCannabisParticle(ctx, 0, 0, this.size);
+        break;
+      case 'combo':
+        // Combo-Partikel: Explosions-Effekt
+        this.drawComboParticle(ctx, 0, 0, this.size);
+        break;
       default:
-        // Kreis
-        ctx.fillStyle = this.color;
+        // Kreis mit Gradient und Glow
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+        gradient.addColorStop(0, this.color);
+        gradient.addColorStop(1, this.color + '00');
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(0, 0, this.size, 0, Math.PI * 2);
         ctx.fill();
     }
     
     ctx.restore();
+  }
+  
+  drawCannabisParticle(ctx, x, y, size) {
+    // Cannabis-Blatt-ähnliche Form
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.ellipse(x, y, size, size * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Zusätzliche Details
+    ctx.fillStyle = this.color + 'CC';
+    ctx.beginPath();
+    ctx.ellipse(x, y, size * 0.6, size * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawComboParticle(ctx, x, y, size) {
+    // Explosions-Effekt mit mehreren Strahlen
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const angle = (Math.PI * 2 * i) / 8;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(
+        x + Math.cos(angle) * size,
+        y + Math.sin(angle) * size
+      );
+      ctx.stroke();
+    }
+    // Zentrum
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.3, 0, Math.PI * 2);
+    ctx.fill();
   }
   
   drawStar(ctx, x, y, outerRadius, innerRadius, points) {
@@ -145,14 +194,28 @@ class ParticleSystem {
     }
   }
   
-  // Explosion
-  explode(x, y, type, count = 20) {
+  // Explosion - Premium Version
+  explode(x, y, type, count = 30) {
+    // Mehrschichtige Explosion
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count;
-      const speed = 2 + Math.random() * 3;
+      const speed = 2 + Math.random() * 4;
       const particle = new Particle(x, y, type);
       particle.vx = Math.cos(angle) * speed;
       particle.vy = Math.sin(angle) * speed;
+      particle.size = 4 + Math.random() * 6; // Größere Partikel
+      this.particles.push(particle);
+    }
+    
+    // Zusätzliche kleine Partikel für Dichte
+    for (let i = 0; i < count * 0.5; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 2;
+      const particle = new Particle(x, y, type);
+      particle.vx = Math.cos(angle) * speed;
+      particle.vy = Math.sin(angle) * speed;
+      particle.size = 2 + Math.random() * 3;
+      particle.decay = 0.03 + Math.random() * 0.02; // Schnelleres Fade
       this.particles.push(particle);
     }
   }

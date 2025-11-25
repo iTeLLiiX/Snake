@@ -1,0 +1,625 @@
+/* ============================================
+   MODERN DESIGN ANIMATIONS
+   Micro Interactions, Macro Animations, Experimental Navigation
+   ============================================ */
+
+/* Google Fonts - Expressive Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+
+/* Expressive Typography */
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-expressive: 'Space Grotesk', sans-serif;
+  --font-display: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-primary);
+}
+
+h1, h2, h3, .expressive-text {
+  font-family: var(--font-expressive);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.display-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* Micro Interactions - Premium Hover Effects */
+.game-button,
+.d-pad-button,
+.pause-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+/* Ripple Effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple-animation 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Macro Animations - Screen Transitions */
+.screen {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Slide Transition */
+.slide-enter {
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-exit {
+  animation: slideOutLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/* Scale Transition */
+.scale-enter {
+  animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scale-exit {
+  animation: scaleOut 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Rotate Transition (3D) */
+.rotate-enter {
+  animation: rotateIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rotate-exit {
+  animation: rotateOut 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes rotateIn {
+  from {
+    transform: rotateY(-90deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes rotateOut {
+  from {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+}
+
+/* Blur Transition */
+.blur-enter {
+  animation: blurIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blur-exit {
+  animation: blurOut 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes blurIn {
+  from {
+    filter: blur(20px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes blurOut {
+  from {
+    filter: blur(0);
+    opacity: 1;
+  }
+  to {
+    filter: blur(20px);
+    opacity: 0;
+  }
+}
+
+/* Glitch Effect */
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+  animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(31px, 9999px, 94px, 0);
+    transform: skew(0.5deg);
+  }
+  5% {
+    clip: rect(75px, 9999px, 100px, 0);
+    transform: skew(0.8deg);
+  }
+  10% {
+    clip: rect(42px, 9999px, 23px, 0);
+    transform: skew(0.3deg);
+  }
+  15% {
+    clip: rect(12px, 9999px, 77px, 0);
+    transform: skew(0.9deg);
+  }
+  20% {
+    clip: rect(88px, 9999px, 33px, 0);
+    transform: skew(0.2deg);
+  }
+  25% {
+    clip: rect(55px, 9999px, 66px, 0);
+    transform: skew(0.7deg);
+  }
+  30% {
+    clip: rect(22px, 9999px, 11px, 0);
+    transform: skew(0.4deg);
+  }
+  35% {
+    clip: rect(99px, 9999px, 44px, 0);
+    transform: skew(0.6deg);
+  }
+  40% {
+    clip: rect(33px, 9999px, 88px, 0);
+    transform: skew(0.1deg);
+  }
+  45% {
+    clip: rect(66px, 9999px, 22px, 0);
+    transform: skew(0.5deg);
+  }
+  50% {
+    clip: rect(11px, 9999px, 99px, 0);
+    transform: skew(0.8deg);
+  }
+  55% {
+    clip: rect(44px, 9999px, 33px, 0);
+    transform: skew(0.3deg);
+  }
+  60% {
+    clip: rect(77px, 9999px, 66px, 0);
+    transform: skew(0.9deg);
+  }
+  65% {
+    clip: rect(22px, 9999px, 11px, 0);
+    transform: skew(0.2deg);
+  }
+  70% {
+    clip: rect(99px, 9999px, 44px, 0);
+    transform: skew(0.7deg);
+  }
+  75% {
+    clip: rect(33px, 9999px, 88px, 0);
+    transform: skew(0.4deg);
+  }
+  80% {
+    clip: rect(66px, 9999px, 22px, 0);
+    transform: skew(0.6deg);
+  }
+  85% {
+    clip: rect(11px, 9999px, 99px, 0);
+    transform: skew(0.1deg);
+  }
+  90% {
+    clip: rect(44px, 9999px, 33px, 0);
+    transform: skew(0.5deg);
+  }
+  95% {
+    clip: rect(77px, 9999px, 66px, 0);
+    transform: skew(0.8deg);
+  }
+  100% {
+    clip: rect(22px, 9999px, 11px, 0);
+    transform: skew(0.3deg);
+  }
+}
+
+@keyframes glitch-anim2 {
+  0% {
+    clip: rect(65px, 9999px, 100px, 0);
+    transform: skew(0.3deg);
+  }
+  5% {
+    clip: rect(14px, 9999px, 33px, 0);
+    transform: skew(0.7deg);
+  }
+  10% {
+    clip: rect(90px, 9999px, 11px, 0);
+    transform: skew(0.2deg);
+  }
+  15% {
+    clip: rect(55px, 9999px, 77px, 0);
+    transform: skew(0.9deg);
+  }
+  20% {
+    clip: rect(22px, 9999px, 44px, 0);
+    transform: skew(0.4deg);
+  }
+  25% {
+    clip: rect(88px, 9999px, 66px, 0);
+    transform: skew(0.6deg);
+  }
+  30% {
+    clip: rect(33px, 9999px, 22px, 0);
+    transform: skew(0.1deg);
+  }
+  35% {
+    clip: rect(99px, 9999px, 55px, 0);
+    transform: skew(0.8deg);
+  }
+  40% {
+    clip: rect(11px, 9999px, 88px, 0);
+    transform: skew(0.5deg);
+  }
+  45% {
+    clip: rect(77px, 9999px, 33px, 0);
+    transform: skew(0.3deg);
+  }
+  50% {
+    clip: rect(44px, 9999px, 66px, 0);
+    transform: skew(0.7deg);
+  }
+  55% {
+    clip: rect(22px, 9999px, 11px, 0);
+    transform: skew(0.2deg);
+  }
+  60% {
+    clip: rect(99px, 9999px, 44px, 0);
+    transform: skew(0.9deg);
+  }
+  65% {
+    clip: rect(55px, 9999px, 77px, 0);
+    transform: skew(0.4deg);
+  }
+  70% {
+    clip: rect(88px, 9999px, 22px, 0);
+    transform: skew(0.6deg);
+  }
+  75% {
+    clip: rect(33px, 9999px, 55px, 0);
+    transform: skew(0.1deg);
+  }
+  80% {
+    clip: rect(11px, 9999px, 88px, 0);
+    transform: skew(0.8deg);
+  }
+  85% {
+    clip: rect(77px, 9999px, 33px, 0);
+    transform: skew(0.5deg);
+  }
+  90% {
+    clip: rect(44px, 9999px, 66px, 0);
+    transform: skew(0.3deg);
+  }
+  95% {
+    clip: rect(22px, 9999px, 11px, 0);
+    transform: skew(0.7deg);
+  }
+  100% {
+    clip: rect(99px, 9999px, 44px, 0);
+    transform: skew(0.2deg);
+  }
+}
+
+/* 3D Card Flip */
+.card-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-3d:hover {
+  transform: rotateY(10deg) rotateX(5deg);
+}
+
+/* Bento Grid Layout */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.bento-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.bento-item:hover::before {
+  left: 100%;
+}
+
+.bento-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+/* Bento Grid Variants */
+.bento-item-large {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.bento-item-wide {
+  grid-column: span 2;
+}
+
+.bento-item-tall {
+  grid-row: span 2;
+}
+
+/* Blending Images and Graphics */
+.blend-multiply {
+  mix-blend-mode: multiply;
+}
+
+.blend-screen {
+  mix-blend-mode: screen;
+}
+
+.blend-overlay {
+  mix-blend-mode: overlay;
+}
+
+.blend-difference {
+  mix-blend-mode: difference;
+}
+
+.blend-exclusion {
+  mix-blend-mode: exclusion;
+}
+
+/* Negative Space - White Space */
+.negative-space {
+  padding: 4rem 2rem;
+  margin: 2rem 0;
+}
+
+.spacious {
+  padding: 3rem;
+  margin: 2rem;
+}
+
+/* Full Screen Headers */
+.fullscreen-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Experimental Navigation */
+.experimental-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* Brutalism Style */
+.brutal {
+  border: 4px solid #000;
+  box-shadow: 8px 8px 0 #000;
+  background: #fff;
+  color: #000;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.brutal:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+/* Parallax Effect */
+.parallax {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #4CAF50, #81C784, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Neumorphism */
+.neu {
+  background: #1a1a1a;
+  box-shadow: 
+    8px 8px 16px rgba(0, 0, 0, 0.5),
+    -8px -8px 16px rgba(76, 175, 80, 0.1);
+  border-radius: 16px;
+}
+
+/* Morphing Button */
+.morph-button {
+  transition: border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.morph-button.circle {
+  border-radius: 50%;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(76, 175, 80, 0.2);
+  z-index: 9999;
+}
+
+.scroll-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--scroll-progress, 0%);
+  background: linear-gradient(90deg, #4CAF50, #81C784);
+  transition: width 0.1s;
+}
+

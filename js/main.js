@@ -12,6 +12,10 @@ let soundManager;
 // Initialisierung wenn DOM geladen
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    // Animation System initialisieren (muss zuerst geladen werden)
+    animationSystem = new AnimationSystem();
+    window.animationSystem = animationSystem; // Global verfügbar
+    
     // Sound Manager initialisieren
     soundManager = new SoundManager();
     await soundManager.loadSounds();

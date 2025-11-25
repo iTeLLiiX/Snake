@@ -93,10 +93,34 @@ class PowerUpItem {
   draw(ctx, cellSize) {
     if (!this.spawned) return;
     
+    // Sicherstellen, dass cellSize gültig ist
+    if (!cellSize || !isFinite(cellSize) || cellSize <= 0) {
+      console.warn('PowerUpItem.draw: Invalid cellSize', cellSize);
+      return;
+    }
+    
+    // Sicherstellen, dass pulse gültig ist
+    if (!isFinite(this.pulse)) {
+      this.pulse = 0;
+    }
+    
     const x = this.position.x * cellSize + cellSize / 2;
     const y = this.position.y * cellSize + cellSize / 2;
     const size = cellSize * 0.8;
+    
+    // Sicherstellen, dass alle Werte endlich sind
+    const sinPulse = Math.sin(this.pulse);
+    if (!isFinite(sinPulse)) {
+      this.pulse = 0;
+    }
+    
     const pulseSize = size * (1 + Math.sin(this.pulse) * 0.1);
+    
+    // Validierung: pulseSize muss endlich und positiv sein
+    if (!isFinite(pulseSize) || pulseSize <= 0 || pulseSize > cellSize * 2) {
+      console.warn('PowerUpItem.draw: Invalid pulseSize', pulseSize);
+      return;
+    }
     
     ctx.save();
     ctx.translate(x, y);
@@ -104,6 +128,9 @@ class PowerUpItem {
     
     // Glow-Effekt
     const glowIntensity = (Math.sin(this.pulse) + 1) * 0.5;
+    
+    // Sicherstellen, dass glowIntensity gültig ist
+    const validGlowIntensity = isFinite(glowIntensity) ? Math.max(0, Math.min(1, glowIntensity)) : 0.5;
     
     // Farben basierend auf Typ
     let color = '#4CAF50';
@@ -128,25 +155,55 @@ class PowerUpItem {
         break;
     }
     
-    // Glow
-    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, pulseSize);
-    gradient.addColorStop(0, glowColor + Math.floor(glowIntensity * 100).toString(16).padStart(2, '0'));
-    gradient.addColorStop(1, glowColor + '00');
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
-    ctx.fill();
+    // Glow - nur wenn pulseSize gültig ist
+    // Zusätzliche Sicherheitsprüfung direkt vor createRadialGradient
+    const safePulseSize = isFinite(pulseSize) && pulseSize > 0 && pulseSize < 10000 ? pulseSize : size;
+    
+    try {
+      // Nochmal prüfen, dass alle Werte endlich sind
+      if (!isFinite(safePulseSize) || safePulseSize <= 0) {
+        throw new Error('Invalid pulseSize: ' + safePulseSize);
+      }
+      
+      const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, safePulseSize);
+      const alphaHex = Math.floor(validGlowIntensity * 255).toString(16).padStart(2, '0');
+      gradient.addColorStop(0, glowColor + alphaHex);
+      gradient.addColorStop(1, glowColor + '00');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(0, 0, safePulseSize, 0, Math.PI * 2);
+      ctx.fill();
+    } catch (error) {
+      console.warn('PowerUpItem.draw: Gradient error', error, { 
+        pulseSize, 
+        safePulseSize, 
+        size, 
+        cellSize, 
+        pulse: this.pulse,
+        x, 
+        y 
+      });
+      // Fallback: einfacher Kreis ohne Gradient
+      const fallbackSize = isFinite(size) && size > 0 ? size : cellSize * 0.8;
+      ctx.fillStyle = glowColor + '80';
+      ctx.beginPath();
+      ctx.arc(0, 0, fallbackSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
     
     // Haupt-Form (Diamant für Power-Up) - Größer
+    // Sicherstellen, dass safePulseSize verwendet wird
+    const diamondSize = isFinite(safePulseSize) && safePulseSize > 0 ? safePulseSize : size;
+    
     ctx.fillStyle = color;
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 3; // Dickerer Rand
     
     ctx.beginPath();
-    ctx.moveTo(0, -pulseSize / 2);
-    ctx.lineTo(pulseSize / 2, 0);
-    ctx.lineTo(0, pulseSize / 2);
-    ctx.lineTo(-pulseSize / 2, 0);
+    ctx.moveTo(0, -diamondSize / 2);
+    ctx.lineTo(diamondSize / 2, 0);
+    ctx.lineTo(0, diamondSize / 2);
+    ctx.lineTo(-diamondSize / 2, 0);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();

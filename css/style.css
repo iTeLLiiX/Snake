@@ -3,27 +3,32 @@
    Mobile-first Design
    ============================================ */
 
-/* CSS Custom Properties - Farbpalette */
+/* CSS Custom Properties - Premium Farbpalette */
 :root {
-  /* Primärfarben - Cannabis-Theme */
+  /* Primärfarben - Cannabis-Theme (Premium) */
   --green-primary: #4CAF50;
   --green-dark: #2E7D32;
   --green-darker: #1B5E20;
   --green-light: #81C784;
+  --green-glow: rgba(76, 175, 80, 0.6);
   
-  /* Akzentfarben */
+  /* Akzentfarben (Premium) */
   --orange: #FF9800;
   --yellow: #FFC107;
   --purple: #9C27B0;
+  --gold: #FFD700;
+  --gold-glow: rgba(255, 215, 0, 0.5);
   
-  /* Hintergrund */
-  --bg-dark: #1A1A1A;
-  --bg-darker: #0F0F0F;
-  --bg-grid: #2D2D2D;
+  /* Hintergrund (Premium) */
+  --bg-dark: #0A0A0A;
+  --bg-darker: #050505;
+  --bg-grid: #1A1A1A;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
   
-  /* Text */
+  /* Text (Premium) */
   --text-primary: #FFFFFF;
-  --text-secondary: #B0B0B0;
+  --text-secondary: #CCCCCC;
+  --text-glow: rgba(255, 255, 255, 0.8);
   
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -32,10 +37,18 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
   
-  /* Transitions */
+  /* Transitions (Premium) */
   --transition-fast: 150ms;
   --transition-normal: 300ms;
   --transition-slow: 500ms;
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Shadows (Premium) */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 20px var(--green-glow);
+  --shadow-gold-glow: 0 0 30px var(--gold-glow);
 }
 
 /* Reset & Base Styles */
@@ -200,6 +213,38 @@ html, body {
 #start-screen .screen-content {
   padding-top: var(--spacing-xl);
   justify-content: flex-start;
+  gap: var(--spacing-lg);
+}
+
+/* Full Screen Header Styling */
+.fullscreen-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.fullscreen-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fullscreen-header .screen-content {
+  position: relative;
+  z-index: 1;
 }
 
 #start-screen .logo {
@@ -218,21 +263,23 @@ html, body {
   color: var(--text-primary);
   background: 
     linear-gradient(135deg, var(--green-primary) 0%, var(--green-dark) 100%),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.2), transparent);
-  border: 2px solid rgba(76, 175, 80, 0.5);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.3), transparent);
+  border: 2px solid rgba(76, 175, 80, 0.6);
   border-radius: 16px;
   cursor: pointer;
-  transition: all var(--transition-fast) ease;
+  transition: all var(--transition-normal) var(--transition-smooth);
   box-shadow: 
-    0 4px 12px rgba(76, 175, 80, 0.4),
-    0 0 20px rgba(76, 175, 80, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 4px 16px rgba(76, 175, 80, 0.5),
+    0 0 30px rgba(76, 175, 80, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   touch-action: manipulation;
   min-height: 44px;
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .game-button::before {
@@ -260,13 +307,15 @@ html, body {
 .game-button:hover {
   background: 
     linear-gradient(135deg, var(--green-light) 0%, var(--green-primary) 100%),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.3), transparent);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent);
   box-shadow: 
-    0 6px 20px rgba(76, 175, 80, 0.5),
-    0 0 30px rgba(76, 175, 80, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 8px 24px rgba(76, 175, 80, 0.7),
+    0 0 40px rgba(76, 175, 80, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   border-color: var(--green-light);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  text-shadow: 0 2px 8px rgba(76, 175, 80, 0.8);
 }
 
 /* Game Screen */
@@ -440,18 +489,26 @@ html, body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Canvas - Premium Style mit Performance-Optimierungen */
+/* Canvas - Premium Style mit Performance-Optimierungen & 3D Effect */
 .game-canvas {
   display: block;
   background: 
-    radial-gradient(circle at center, rgba(76, 175, 80, 0.05) 0%, transparent 70%),
-    var(--bg-grid);
+    radial-gradient(ellipse at center, rgba(76, 175, 80, 0.08) 0%, transparent 70%),
+    linear-gradient(135deg, var(--bg-grid) 0%, var(--bg-darker) 100%);
   border: 3px solid var(--green-dark);
   border-radius: 12px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(76, 175, 80, 0.1),
-    inset 0 0 20px rgba(0, 0, 0, 0.3);
+    0 0 40px rgba(76, 175, 80, 0.3),
+    inset 0 0 60px rgba(76, 175, 80, 0.1),
+    var(--shadow-lg);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.game-canvas:hover {
+  transform: translateZ(10px) rotateX(2deg);
+}
   
   /* Performance-Optimierungen für flüssiges 60 FPS Rendering */
   touch-action: none;

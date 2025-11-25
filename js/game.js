@@ -197,7 +197,13 @@ class Game {
     this.isRunning = true;
     this.isPaused = false;
     this.lastTime = performance.now();
-    this.gameLoop();
+    
+    // Game Loop sofort starten (auch ohne DevTools)
+    // Verwende requestAnimationFrame mit sofortigem Call
+    requestAnimationFrame((time) => {
+      this.lastTime = time;
+      this.gameLoop(time);
+    });
     
     // Musik starten
     if (window.soundManager) {
@@ -269,16 +275,20 @@ class Game {
       return;
     }
     
+    // Erster Frame: deltaTime auf 0 setzen (verhindert große Sprünge)
+    if (this.lastTime === 0) {
+      this.lastTime = currentTime;
+    }
+    
     const deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
     
     // Cap deltaTime für Stabilität (max 100ms = 10 FPS minimum)
-    const cappedDeltaTime = Math.min(deltaTime, 100);
+    // Mindestens 1ms für ersten Frame
+    const cappedDeltaTime = Math.max(1, Math.min(deltaTime, 100));
     
     // Update (immer, für smooth Animationen)
-    if (cappedDeltaTime > 0) {
-      this.update(cappedDeltaTime);
-    }
+    this.update(cappedDeltaTime);
     
     // Render (immer, für 60 FPS)
     this.render();

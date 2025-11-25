@@ -36,19 +36,27 @@ class UIManager {
   
   // Event-Listener einrichten
   setupEventListeners() {
-    // Start Screen
-    document.getElementById('play-button').addEventListener('click', () => {
+    // Start Screen - mit Micro Interactions
+    const playButton = document.getElementById('play-button');
+    playButton.addEventListener('click', (e) => {
       if (window.soundManager) window.soundManager.playSound('button');
+      if (window.animationSystem) {
+        window.animationSystem.createRipple(e, playButton);
+      }
       this.hideAllScreens();
-      this.showScreen('game');
+      this.showScreen('game', 'scale');
       if (window.game) {
         window.game.start();
       }
     });
     
-    document.getElementById('settings-button').addEventListener('click', () => {
+    const settingsButton = document.getElementById('settings-button');
+    settingsButton.addEventListener('click', (e) => {
       if (window.soundManager) window.soundManager.playSound('button');
-      this.showScreen('settings');
+      if (window.animationSystem) {
+        window.animationSystem.createRipple(e, settingsButton);
+      }
+      this.showScreen('settings', 'slide');
     });
     
     // Game Over Screen
@@ -129,27 +137,52 @@ class UIManager {
     });
   }
   
-  // Screen anzeigen (mit Cinematic Transition)
-  showScreen(screenName) {
-    // Fade Out alle Screens
-    Object.values(this.screens).forEach(screen => {
-      if (screen.classList.contains('active')) {
-        screen.classList.add('fade-out');
-        setTimeout(() => {
-          screen.classList.remove('active', 'fade-out');
-        }, 300);
-      }
-    });
+  // Screen anzeigen (mit Premium Macro Animation)
+  showScreen(screenName, transitionType = 'fade') {
+    const currentScreen = Object.values(this.screens).find(s => s.classList.contains('active'));
+    const targetScreen = this.screens[screenName];
     
-    // Fade In neuer Screen
-    setTimeout(() => {
-      if (this.screens[screenName]) {
-        this.screens[screenName].classList.add('fade-in', 'active');
+    if (!targetScreen) return;
+    
+    // Experimental Navigation mit verschiedenen Transition-Typen
+    if (window.animationSystem) {
+      const transitionTypes = ['fade', 'slide', 'scale', 'rotate', 'blur'];
+      const randomType = transitionTypes[Math.floor(Math.random() * transitionTypes.length)];
+      
+      if (currentScreen) {
+        window.animationSystem.experimentalTransition(
+          currentScreen.id,
+          targetScreen.id,
+          transitionType === 'random' ? randomType : transitionType
+        );
+      } else {
+        // Erster Screen - einfacher Fade
+        targetScreen.style.display = 'flex';
+        targetScreen.style.opacity = '0';
+        targetScreen.classList.add('active');
         setTimeout(() => {
-          this.screens[screenName].classList.remove('fade-in');
-        }, 500);
+          targetScreen.style.opacity = '1';
+        }, 50);
       }
-    }, 300);
+    } else {
+      // Fallback: Standard Fade
+      Object.values(this.screens).forEach(screen => {
+        if (screen.classList.contains('active')) {
+          screen.classList.add('fade-out');
+          setTimeout(() => {
+            screen.classList.remove('active', 'fade-out');
+          }, 300);
+        }
+      });
+      
+      setTimeout(() => {
+        targetScreen.classList.add('fade-in', 'active');
+        targetScreen.style.display = 'flex';
+        setTimeout(() => {
+          targetScreen.classList.remove('fade-in');
+        }, 500);
+      }, 300);
+    }
   }
   
   // Alle Screens verstecken
