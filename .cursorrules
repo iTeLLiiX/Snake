@@ -1,0 +1,437 @@
+# 🐍 LUCA'S SNAKE ADVENTURE - Cursor Rules
+
+## PROJEKT-KONTEXT
+
+Dies ist ein Snake-Spiel mit Adventure-Elementen für Luca. Das Spiel hat ein Cannabis-Theme und ist mobile-first entwickelt.
+
+**Projektname:** Luca's Snake Adventure
+**Ziel:** Cooles, modernes Snake-Spiel mit Adventure-Features für Mobile
+**Theme:** Cannabis-inspiriert (entspannt, grüne Farben, Marijuana-Items)
+
+---
+
+## TECHNOLOGIE-STACK
+
+- **Sprache:** Vanilla JavaScript (ES6+)
+- **Rendering:** HTML5 Canvas
+- **Styling:** CSS3 (Mobile-first, Responsive)
+- **Keine Dependencies:** Pure Vanilla JS, keine Frameworks
+- **Build-Tool:** Keine (direkt im Browser lauffähig)
+
+---
+
+## PROJEKTSTRUKTUR
+
+```
+lucasnake/
+├── index.html                 # Haupt-HTML
+├── css/
+│   ├── style.css             # Haupt-Styles
+│   └── mobile.css            # Mobile-spezifische Styles
+├── js/
+│   ├── main.js               # Entry Point
+│   ├── game.js               # Game Controller & Loop
+│   ├── snake.js              # Snake Entity Class
+│   ├── food.js               # Food System
+│   ├── powerups.js           # Power-Up System
+│   ├── ui.js                 # UI Management (Screens, Menüs)
+│   ├── controls.js           # Touch & Keyboard Controls
+│   └── utils.js              # Helper Functions
+├── assets/
+│   └── images/               # Alle Assets sind bereits sortiert!
+│       ├── snake/            # 18 Dateien (green/yellow, head/blob/eyes)
+│       ├── food/             # 15 Dateien (apples, Marijuana.png, bomb, etc.)
+│       ├── walls/            # 19 Dateien (wall_block_*.png)
+│       ├── logo/             # weedgame.png
+│       └── ui/               # 226 Dateien
+│           ├── buttons/      # Btn*.png, Button*.png, CheckBox*.png
+│           ├── icons/        # Icon*.png (105 Stück)
+│           ├── messages/     # Msg*.png (20 Stück)
+│           ├── numbers/     # Number*.png (45 Stück)
+│           ├── progress/    # Progress*.png (5 Stück)
+│           └── sliders/     # Slider*.png (6 Stück)
+```
+
+**WICHTIG:** Alle Assets sind bereits sortiert und verfügbar. Verwende die korrekten Pfade!
+
+---
+
+## CODE-STIL & KONVENTIONEN
+
+### JavaScript
+- **ES6+ Features:** Classes, Arrow Functions, Destructuring, Template Literals
+- **Naming:**
+  - Classes: PascalCase (`class Snake`, `class GameController`)
+  - Functions: camelCase (`update()`, `checkCollision()`)
+  - Constants: UPPER_SNAKE_CASE (`const GRID_SIZE = 20`)
+  - Variables: camelCase (`let snakeSpeed`, `const canvas`)
+- **Comments:** Deutsch für wichtige Erklärungen, Englisch für Code-Kommentare
+- **Formatting:** 2 Spaces Indentation, Semikolons verwenden
+
+### CSS
+- **Mobile-first:** Beginne mit Mobile-Styles, dann Desktop mit Media Queries
+- **Naming:** kebab-case (`game-container`, `score-display`)
+- **Responsive:** Verwende `rem` und `%` statt `px` wo möglich
+- **Variables:** CSS Custom Properties für Farben
+
+### HTML
+- **Semantic HTML:** Verwende semantische Tags (`<main>`, `<section>`, `<header>`)
+- **Accessibility:** ARIA-Labels wo nötig, Keyboard-Navigation
+- **Meta-Tags:** Mobile-optimiert (viewport, apple-mobile-web-app)
+
+---
+
+## ASSET-PFADE & VERWENDUNG
+
+### Snake Assets
+- **Head:** `assets/images/snake/snake_green_head.png` (Standard)
+- **Body:** `assets/images/snake/snake_green_blob.png` (Standard)
+- **Alternative:** `snake_green_eyes.png` (mit Augen)
+- **Größen:** Verwende Original-Größe, skaliere im Code
+
+### Food Assets
+- **Normal Food:** `assets/images/food/apple_green.png` oder `apple_red.png`
+- **Special Food:** `assets/images/food/Marijuana.png` (mehr Punkte!)
+- **Negative Item:** `assets/images/food/bomb.png` (Game Over oder negativer Effekt)
+- **Weitere:** `easter_egg.png`, `oliebol.png` für Special Items
+
+### UI Assets
+- **Logo:** `assets/images/logo/weedgame.png` (Start-Screen, Game-Over)
+- **Buttons:** `assets/images/ui/buttons/Button01.png` bis `Button25.png`
+- **Icons:** `assets/images/ui/icons/Icon01.png` bis `Icon105.png`
+- **Numbers:** `assets/images/ui/numbers/Number01.png` bis `Number45.png` (für Score)
+- **Messages:** `assets/images/ui/messages/Msg01.png` bis `Msg20.png` (Game-Over, etc.)
+
+**WICHTIG:** Alle Assets sind PNG mit Transparenz. Lade sie als Image-Objekte und zeichne sie auf Canvas.
+
+---
+
+## GAMEPLAY-SPEZIFIKATIONEN
+
+### Grid-System
+- **Basis-Größe:** 20x20px pro Zelle (responsive anpassbar)
+- **Mobile Portrait:** 15-18 Zellen breit
+- **Mobile Landscape:** 20-25 Zellen breit
+- **Desktop:** 25-30 Zellen breit
+- **Berechnung:** Automatisch basierend auf Bildschirmgröße
+
+### Snake-Bewegung
+- **Geschwindigkeit:** Start bei 150ms pro Bewegung
+- **Richtungen:** Up, Down, Left, Right
+- **Verhindere:** 180°-Wendungen (nicht direkt umkehren)
+- **Wachstum:** +1 Segment pro gefressenem Item
+
+### Food-System
+- **Normal Food:** 10 Punkte
+- **Marijuana (Special):** 50 Punkte
+- **Spawn-Logic:** Zufällig, nicht auf Snake-Körper
+- **Respawn:** Sofort nach Fressen
+
+### Power-Ups
+1. **Speed Boost:** +50% Geschwindigkeit, 5 Sekunden
+2. **Slow Motion:** -50% Geschwindigkeit, 5 Sekunden
+3. **Shield:** Einmalige Kollisionsimmunität
+4. **Score Multiplier:** 2x Punkte, 10 Sekunden
+
+### Level-System
+- **Level 1:** 10 Items → Level 2
+- **Level 2:** 15 Items → Level 3
+- **Level 3:** 20 Items → Level 4
+- **Geschwindigkeit:** +20% pro Level
+- **Max Level:** Unbegrenzt
+
+### Score-System
+- **Normal Food:** 10 Punkte
+- **Marijuana:** 50 Punkte
+- **Multiplier:** Verdoppelt alle Punkte
+- **Highscore:** LocalStorage speichern
+
+---
+
+## MOBILE-OPTIMIERUNGEN
+
+### Touch-Steuerung
+- **Swipe-Gesten:** Min. 30px Bewegung erforderlich
+- **Dead-Zone:** Verhindere versehentliche Swipes
+- **Alternative:** On-Screen D-Pad (4 Buttons, 60x60px)
+- **Touch-Targets:** Min. 44x44px (Apple HIG)
+
+### Viewport & Meta-Tags
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+```
+
+### Performance
+- **Game Loop:** requestAnimationFrame (60 FPS Ziel)
+- **Touch Events:** Passive listeners wo möglich
+- **Canvas:** `touch-action: none` für Canvas-Element
+- **Rendering:** Nur geänderte Bereiche neu zeichnen (wenn möglich)
+
+### Responsive Design
+- **Portrait & Landscape:** Beide unterstützen
+- **Flexible Grid:** Passt sich automatisch an
+- **UI-Skalierung:** Buttons und Text skalieren mit Bildschirmgröße
+
+---
+
+## DESIGN-SPEZIFIKATIONEN
+
+### Farbpalette
+```css
+--green-primary: #4CAF50;
+--green-dark: #2E7D32;
+--green-darker: #1B5E20;
+--green-light: #81C784;
+--orange: #FF9800;
+--yellow: #FFC107;
+--purple: #9C27B0;
+--bg-dark: #1A1A1A;
+--bg-darker: #0F0F0F;
+--bg-grid: #2D2D2D;
+--text-primary: #FFFFFF;
+--text-secondary: #B0B0B0;
+```
+
+### Animationen
+- **Snake Movement:** Smooth, 60 FPS
+- **Food Spawn:** Fade-in (300ms)
+- **Power-Up Activation:** Glow + Scale Animation
+- **Game Over:** Fade-out + Score Animation
+- **Screen Transitions:** Slide/Fade (300ms)
+
+### Typografie
+- **Headings:** Moderne Sans-Serif (z.B. 'Inter', 'Poppins' via Google Fonts)
+- **Body:** System Font Stack
+- **Game UI:** Monospace für Score (z.B. 'Courier New')
+
+---
+
+## UI-SCREENS
+
+### 1. Start Screen
+- Logo: `weedgame.png`
+- Play-Button: `Button01.png` oder ähnlich
+- Settings-Button: `Button02.png` oder ähnlich
+- Highscore-Anzeige (aus LocalStorage)
+
+### 2. Game Screen
+- Score (oben links): Number-Sprites verwenden
+- Level (oben rechts): Number-Sprites verwenden
+- Pause-Button (oben rechts)
+- Game Canvas (zentral, responsive)
+- Optional: D-Pad Buttons (unten, wenn aktiviert)
+
+### 3. Game Over Screen
+- Message-Box: `Msg01.png` oder ähnlich
+- Final Score: Number-Sprites
+- Highscore: Number-Sprites
+- "Play Again" Button: `Button03.png` oder ähnlich
+- "Menu" Button: `Button04.png` oder ähnlich
+
+### 4. Settings Screen
+- Schwierigkeit: Slider oder Buttons
+- Sound On/Off: CheckBox
+- Steuerung: Swipe / D-Pad Auswahl
+- Zurück-Button
+
+---
+
+## ENTWICKLUNGS-PHASEN
+
+### Phase 1: Foundation
+- HTML-Struktur mit Canvas
+- CSS Basis-Styling (Mobile-first)
+- Canvas Setup & Grid-Rendering
+- Basis-Game-Loop
+
+### Phase 2: Core Gameplay
+- Snake Entity (Bewegung, Wachstum)
+- Food System (Spawn, Collision)
+- Kollisionserkennung (Wände, Selbst)
+- Score System
+- Game Over
+
+### Phase 3: Mobile Integration
+- Touch Controls (Swipe)
+- D-Pad Buttons (Alternative)
+- Responsive Grid
+- Mobile Testing
+
+### Phase 4: Adventure Features
+- Power-Up System (4 Typen)
+- Level System (Progression)
+- Special Items (Marijuana, etc.)
+- Visuelle Effekte
+
+### Phase 5: Design & Polish
+- Asset-Integration (alle Sprites)
+- Animationen (Smooth, 60 FPS)
+- UI-Screens (Start, Game, Game Over, Settings)
+- Partikel-Effekte
+
+### Phase 6: Testing & Launch
+- Cross-Browser-Testing
+- Mobile-Device-Testing
+- Performance-Optimierung
+- Bug-Fixes
+
+---
+
+## WICHTIGE REGELN
+
+### Allgemein
+- **Sprache:** Alle Kommentare und UI-Texte auf DEUTSCH
+- **Keine Dependencies:** Nur Vanilla JS, keine npm-Pakete
+- **Mobile-first:** Immer zuerst Mobile, dann Desktop
+- **Performance:** 60 FPS Ziel, optimiere für Mobile
+
+### Code-Qualität
+- **Sauberer Code:** Lesbar, kommentiert, strukturiert
+- **Modular:** Separate Dateien für verschiedene Systeme
+- **Error Handling:** Try-catch wo nötig, keine unhandled errors
+- **Memory:** Keine Memory Leaks, cleanup bei Game Over
+
+### Asset-Verwendung
+- **Lazy Loading:** Lade Assets beim Start, nicht während Gameplay
+- **Image Caching:** Preload alle benötigten Assets
+- **Größen:** Verwende Original-Größen, skaliere im Code
+- **Fallbacks:** Falls Asset nicht geladen, zeichne einfache Formen
+
+### User Experience
+- **Responsive:** Funktioniert auf allen Bildschirmgrößen
+- **Touch-friendly:** Große Buttons, keine versehentlichen Klicks
+- **Feedback:** Visuelles Feedback bei allen Aktionen
+- **Smooth:** Keine Lag, flüssige Animationen
+
+---
+
+## BEISPIEL-CODE-STRUKTUR
+
+### Game Loop
+```javascript
+class Game {
+  constructor() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.lastTime = 0;
+    this.isRunning = false;
+  }
+  
+  gameLoop(currentTime) {
+    const deltaTime = currentTime - this.lastTime;
+    this.lastTime = currentTime;
+    
+    if (deltaTime >= 1000/60) {
+      this.update(deltaTime);
+      this.render();
+    }
+    
+    if (this.isRunning) {
+      requestAnimationFrame(this.gameLoop.bind(this));
+    }
+  }
+}
+```
+
+### Asset Loading
+```javascript
+function loadImage(path) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = path;
+  });
+}
+```
+
+### Touch Controls
+```javascript
+// Swipe Detection mit min. 30px Bewegung
+// Verhindere 180°-Wendungen
+// Dead-Zone für versehentliche Swipes
+```
+
+---
+
+## QUALITÄTSSICHERUNG
+
+### Performance-Ziele
+- ✅ 60 FPS auf modernen Geräten
+- ✅ 30+ FPS auf älteren Mobilgeräten
+- ✅ < 2 Sekunden Ladezeit
+- ✅ Smooth Animationen ohne Lag
+
+### Browser-Kompatibilität
+- ✅ Chrome/Edge (neueste)
+- ✅ Firefox (neueste)
+- ✅ Safari (iOS/macOS)
+- ✅ Mobile Browser (Chrome Mobile, Safari Mobile)
+
+### Mobile-Features
+- ✅ Touch-Steuerung funktioniert perfekt
+- ✅ Responsive auf allen Bildschirmgrößen
+- ✅ Portrait & Landscape Support
+- ✅ Battery-freundlich
+
+---
+
+## ARBEITSWEISE
+
+### Beim Entwickeln
+1. **Implementiere Features vollständig** - Keine Platzhalter oder Dummy-Code
+2. **Teste sofort** - Nach jedem Feature testen
+3. **Optimiere Performance** - Immer auf Mobile-Performance achten
+4. **Nutze vorhandene Assets** - Alle Assets sind verfügbar, nutze sie!
+
+### Bei Problemen
+- **Performance:** Profiliere mit DevTools, optimiere kritische Pfade
+- **Mobile-Bugs:** Teste auf echten Geräten, nicht nur Desktop
+- **Asset-Probleme:** Prüfe Pfade, verwende Fallbacks
+
+### Code-Organisation
+- **Eine Datei = Ein System** (snake.js = Snake, food.js = Food, etc.)
+- **Klare Trennung:** Game Logic, Rendering, UI, Controls
+- **Wiederverwendbar:** Utils für gemeinsame Funktionen
+
+---
+
+## VERBOTEN
+
+- ❌ Keine Frameworks oder Libraries (nur Vanilla JS)
+- ❌ Keine npm-Dependencies
+- ❌ Keine Platzhalter-Funktionen
+- ❌ Keine Dummy-Inhalte
+- ❌ Keine automatischen README/Docs (außer explizit gewünscht)
+- ❌ Keine englischen UI-Texte (alles auf Deutsch)
+
+---
+
+## ERLAUBT & EMPFOHLEN
+
+- ✅ Vanilla JavaScript ES6+
+- ✅ HTML5 Canvas
+- ✅ CSS3 (Custom Properties, Flexbox, Grid)
+- ✅ LocalStorage für Highscore
+- ✅ Google Fonts (wenn gewünscht)
+- ✅ Moderne Browser APIs (Touch Events, etc.)
+
+---
+
+## ZUSAMMENFASSUNG
+
+**Projekt:** Snake-Spiel mit Cannabis-Theme für Mobile
+**Tech:** Vanilla JS + Canvas
+**Assets:** Alle verfügbar und sortiert in `assets/images/`
+**Ziel:** 60 FPS, Mobile-first, Smooth Gameplay
+**Sprache:** Deutsch (UI & Kommentare)
+
+**WICHTIG:** Arbeite selbstständig, implementiere vollständig, teste sofort, nutze vorhandene Assets!
+
+---
+
+**Version:** 1.0
+**Letzte Aktualisierung:** Finaler Prompt erstellt
+

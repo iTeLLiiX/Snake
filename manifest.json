@@ -1,0 +1,43 @@
+{
+  "name": "Luca's Snake Adventure",
+  "short_name": "Snake Adventure",
+  "description": "Ein cooles Snake-Spiel mit Cannabis-Theme - Rockstar Games Level",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0F0F",
+  "theme_color": "#4CAF50",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/images/logo/weedgame.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/logo/weedgame.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Spielen",
+      "short_name": "Play",
+      "description": "Spiel starten",
+      "url": "/?action=play",
+      "icons": [
+        {
+          "src": "assets/images/logo/weedgame.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}
+

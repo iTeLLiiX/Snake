@@ -1,0 +1,66 @@
+{
+  "name": "lucas-snake-adventure",
+  "version": "1.0.0",
+  "description": "Ein cooles Snake-Spiel mit Cannabis-Theme für Mobile - Vollständiges Game",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "build:electron": "electron-builder",
+    "build:iso": "electron-builder --win --x64 --config.win.target=portable"
+  },
+  "keywords": [
+    "snake",
+    "game",
+    "mobile",
+    "canvas",
+    "javascript",
+    "electron",
+    "desktop"
+  ],
+  "author": "Luca's Snake Adventure",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dein-username/lucasnake.git"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.lucasnake.adventure",
+    "productName": "Luca's Snake Adventure",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!dist",
+      "!**/*.md",
+      "!.git"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        },
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/images/logo/weedgame.png"
+    },
+    "portable": {
+      "artifactName": "LucasSnakeAdventure-${version}-Portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "LucasSnakeAdventure-${version}-Setup.exe"
+    }
+  }
+}

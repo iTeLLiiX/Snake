@@ -1,0 +1,43 @@
+===========================================
+ASSETS ZUM HOCHLADEN - MINIMAL (7 Dateien)
+===========================================
+
+Kopiere diese Dateien in dein GitHub Repository:
+
+1. assets/images/snake/snake_green_head.png
+2. assets/images/snake/snake_green_blob.png
+3. assets/images/food/apple_green.png
+4. assets/images/food/Marijuana.png
+5. assets/images/food/bomb.png
+6. assets/images/logo/weedgame.png
+7. assets/images/ui/messages/Msg01.png
+
+===========================================
+ORDNERSTRUKTUR ERSTELLEN:
+===========================================
+
+assets/
+  images/
+    snake/
+    food/
+    logo/
+    ui/
+      messages/
+
+===========================================
+ALTERNATIVE: ALLES HOCHLADEN
+===========================================
+
+Lade einfach den KOMPLETTEN assets/ Ordner hoch!
+(Dann hast du alle Assets für zukünftige Features)
+
+===========================================
+WICHTIG:
+===========================================
+
+- Verwende die ORIGINAL-Größen (ohne _32 oder _64)
+- Behalte die Ordnerstruktur bei
+- Alle Pfade müssen relativ sein
+
+===========================================
+

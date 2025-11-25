@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Snake Adventure">
+  <meta name="description" content="Luca's Snake Adventure - Ein cooles Snake-Spiel mit Cannabis-Theme">
+  <meta name="theme-color" content="#4CAF50">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="assets/images/logo/weedgame.png">
+  <link rel="icon" type="image/png" href="assets/images/logo/weedgame.png">
+  
+  <title>Luca's Snake Adventure</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- Game Container -->
+  <div id="game-container" class="game-container">
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+      <div class="screen-content">
+        <img src="assets/images/logo/weedgame.png" alt="Luca's Snake Adventure" class="logo" id="logo">
+        <div class="highscore-display">
+          <span class="highscore-label">Highscore:</span>
+          <span id="highscore-value" class="highscore-value">0</span>
+        </div>
+        <button id="play-button" class="game-button">Spielen</button>
+        <button id="settings-button" class="game-button">Einstellungen</button>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+      <div class="game-header">
+        <div class="score-display">
+          <span class="score-label">Punkte:</span>
+          <span id="score-value" class="score-value"><canvas id="score-canvas"></canvas></span>
+        </div>
+        <div class="level-display">
+          <span class="level-label">Level:</span>
+          <span id="level-value" class="level-value"><canvas id="level-canvas"></canvas></span>
+        </div>
+        <!-- Power-Up Timer Display -->
+        <div id="powerup-display" class="powerup-display"></div>
+        <!-- Combo Meter -->
+        <div id="combo-meter" class="combo-meter hidden">
+          <div class="combo-label">COMBO</div>
+          <div class="combo-bar-container">
+            <div id="combo-bar" class="combo-bar"></div>
+          </div>
+          <div id="combo-value" class="combo-value">x1</div>
+        </div>
+        <button id="pause-button" class="pause-button">⏸</button>
+      </div>
+      
+      <canvas id="gameCanvas" class="game-canvas"></canvas>
+      
+      <!-- Mobile D-Pad (optional) -->
+      <div id="d-pad" class="d-pad hidden">
+        <button class="d-pad-button" data-direction="up">↑</button>
+        <div class="d-pad-row">
+          <button class="d-pad-button" data-direction="left">←</button>
+          <button class="d-pad-button" data-direction="down">↓</button>
+          <button class="d-pad-button" data-direction="right">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen">
+      <div class="screen-content">
+        <div class="game-over-message">
+          <div class="message-image-container">
+            <img src="assets/images/ui/messages/Msg01.png" alt="Game Over" class="message-image">
+            <div id="new-highscore-badge" class="new-highscore-badge hidden">🏆 NEUER HIGHSCORE!</div>
+          </div>
+        </div>
+        
+        <div class="final-score">
+          <span class="score-label">Punkte:</span>
+          <span id="final-score-value" class="score-value"><canvas id="final-score-canvas"></canvas></span>
+        </div>
+        
+        <div class="highscore-display">
+          <span class="highscore-label">Highscore:</span>
+          <span id="final-highscore-value" class="highscore-value"><canvas id="final-highscore-canvas"></canvas></span>
+        </div>
+        
+        <!-- Erweiterte Statistiken -->
+        <div class="game-stats">
+          <div class="stat-item">
+            <span class="stat-label">Level erreicht:</span>
+            <span id="final-level-value" class="stat-value">1</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Items gefressen:</span>
+            <span id="final-items-value" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Längste Combo:</span>
+            <span id="final-combo-value" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Spielzeit:</span>
+            <span id="final-time-value" class="stat-value">0s</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Power-Ups gesammelt:</span>
+            <span id="final-powerups-value" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Ø Punkte pro Item:</span>
+            <span id="final-avg-value" class="stat-value">0</span>
+          </div>
+        </div>
+        
+        <button id="play-again-button" class="game-button">Nochmal spielen</button>
+        <button id="menu-button" class="game-button">Menü</button>
+      </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+      <div class="screen-content">
+        <h2 class="settings-title">Einstellungen</h2>
+        
+        <div class="setting-group">
+          <label class="setting-label">Schwierigkeit:</label>
+          <div class="difficulty-buttons">
+            <button class="difficulty-button active" data-difficulty="easy">Leicht</button>
+            <button class="difficulty-button" data-difficulty="medium">Mittel</button>
+            <button class="difficulty-button" data-difficulty="hard">Schwer</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">Steuerung:</label>
+          <div class="control-buttons">
+            <button class="control-button active" data-control="swipe">Swipe</button>
+            <button class="control-button" data-control="dpad">D-Pad</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">Sound:</label>
+          <input type="checkbox" id="sound-toggle" class="sound-toggle" checked>
+          <label for="sound-toggle" class="sound-label">An</label>
+        </div>
+
+        <button id="back-button" class="game-button">Zurück</button>
+      </div>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div id="pause-overlay" class="pause-overlay hidden">
+      <div class="pause-content">
+        <h2 class="pause-title">Pausiert</h2>
+        <button id="resume-button" class="game-button">Weiter</button>
+        <button id="pause-menu-button" class="game-button">Menü</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/numberdisplay.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/snake.js"></script>
+  <script src="js/food.js"></script>
+  <script src="js/powerups.js"></script>
+  <script src="js/powerupitems.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/trails.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+
