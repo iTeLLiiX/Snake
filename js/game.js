@@ -17,6 +17,7 @@ class Game {
     this.isRunning = false;
     this.isPaused = false;
     this.lastTime = 0;
+    this.idleRenderRunning = false; // Flag für Idle Render Loop
     
     // Game Entities
     this.snake = null;
