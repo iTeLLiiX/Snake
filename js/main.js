@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     game = new Game();
     window.game = game; // Global verfügbar
     
+    // Game vollständig initialisieren (Assets laden, etc.)
+    await game.initialize();
+    
     // Controls initialisieren (nach Game, da Game Canvas braucht)
     controls = new Controls(game);
     window.controls = controls; // Global verfügbar

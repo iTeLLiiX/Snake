@@ -148,46 +148,32 @@ class UIManager {
     const currentScreen = Object.values(this.screens).find(s => s.classList.contains('active'));
     const targetScreen = this.screens[screenName];
     
-    if (!targetScreen) return;
+    if (!targetScreen) {
+      console.warn(`Screen "${screenName}" nicht gefunden`);
+      return;
+    }
     
-    // Experimental Navigation mit verschiedenen Transition-Typen
-    if (window.animationSystem) {
-      const transitionTypes = ['fade', 'slide', 'scale', 'rotate', 'blur'];
-      const randomType = transitionTypes[Math.floor(Math.random() * transitionTypes.length)];
-      
-      if (currentScreen) {
-        window.animationSystem.experimentalTransition(
-          currentScreen.id,
-          targetScreen.id,
-          transitionType === 'random' ? randomType : transitionType
-        );
-      } else {
-        // Erster Screen - einfacher Fade
-        targetScreen.style.display = 'flex'; // WICHTIG: Display setzen
-        targetScreen.style.opacity = '0';
-        targetScreen.classList.add('active');
-        setTimeout(() => {
-          targetScreen.style.opacity = '1';
-        }, 50);
-      }
-    } else {
-      // Fallback: Standard Fade
-      Object.values(this.screens).forEach(screen => {
-        if (screen.classList.contains('active')) {
-          screen.classList.add('fade-out');
-          setTimeout(() => {
-            screen.classList.remove('active', 'fade-out');
-          }, 300);
-        }
+    // Verstecke alle Screens zuerst
+    this.hideAllScreens();
+    
+    // Zeige Ziel-Screen
+    targetScreen.style.display = 'flex'; // WICHTIG: Display ZUERST setzen
+    targetScreen.style.opacity = '0';
+    targetScreen.classList.add('active');
+    
+    // Fade-in Animation
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        targetScreen.style.transition = 'opacity 0.3s ease-in-out';
+        targetScreen.style.opacity = '1';
       });
-      
+    });
+    
+    // Wenn Game-Screen, stelle sicher dass Canvas gerendert wird
+    if (screenName === 'game' && window.game) {
       setTimeout(() => {
-        targetScreen.style.display = 'flex'; // WICHTIG: Display setzen BEVOR active Klasse
-        targetScreen.classList.add('fade-in', 'active');
-        setTimeout(() => {
-          targetScreen.classList.remove('fade-in');
-        }, 500);
-      }, 300);
+        window.game.render();
+      }, 100);
     }
   }
   

@@ -70,7 +70,16 @@ class Game {
     
     // Setup
     this.setupCanvas();
-    this.init();
+    
+    // Initialisierung asynchron (nicht im Constructor)
+    // Wird von main.js aufgerufen nach vollständigem Laden
+  }
+  
+  // Initialisierung (wird von main.js aufgerufen)
+  async initialize() {
+    await this.init();
+    // Initiales Rendering nach Initialisierung
+    this.render();
   }
   
   // Canvas Setup
@@ -128,39 +137,73 @@ class Game {
   
   // Initialisierung
   async init() {
-    // Entities erstellen
-    this.snake = new Snake(
-      Math.floor(this.gridWidth / 2),
-      Math.floor(this.gridHeight / 2)
-    );
-    this.food = new Food();
-    this.powerUpItem = new PowerUpItem();
-    this.powerUpManager = new PowerUpManager();
-    this.wallSystem = new WallSystem();
-    
-    // Assets laden
-    await this.loadAssets();
-    
-    // Background initialisieren
-    this.background = new BackgroundSystem(this.canvas);
-    await this.background.loadAssets();
-    
-    // Highscore laden
-    this.highscore = Storage.get('highscore', 0);
-    
-    // Statistics initialisieren
-    if (!statistics) {
-      statistics = new Statistics();
+    try {
+      // Sicherstellen dass Canvas bereit ist
+      if (this.canvas.width === 0 || this.canvas.height === 0) {
+        this.resizeCanvas();
+      }
+      
+      // Background ZUERST initialisieren (für sofortiges Rendering)
+      this.background = new BackgroundSystem(this.canvas);
+      await this.background.loadAssets();
+      
+      // Entities erstellen
+      this.snake = new Snake(
+        Math.floor(this.gridWidth / 2),
+        Math.floor(this.gridHeight / 2)
+      );
+      this.food = new Food();
+      this.powerUpItem = new PowerUpItem();
+      this.powerUpManager = new PowerUpManager();
+      this.wallSystem = new WallSystem();
+      
+      // Assets laden
+      await this.loadAssets();
+      
+      // Highscore laden
+      this.highscore = Storage.get('highscore', 0);
+      
+      // Statistics initialisieren
+      if (!statistics) {
+        statistics = new Statistics();
+      }
+      
+      // Achievement System initialisieren (falls noch nicht geschehen)
+      if (!achievementSystem) {
+        achievementSystem = new AchievementSystem();
+        await achievementSystem.init();
+      }
+      
+      // Initiales Rendering (damit Canvas sofort sichtbar ist)
+      this.render();
+      
+      // Kontinuierliches Rendering auch wenn Spiel nicht läuft (für Hintergrund)
+      this.startIdleRender();
+      
+    } catch (error) {
+      console.error('Fehler bei Game-Initialisierung:', error);
+      // Fallback: Mindestens Hintergrund rendern
+      this.render();
     }
+  }
+  
+  // Idle Render Loop (für Hintergrund-Rendering wenn Spiel nicht läuft)
+  startIdleRender() {
+    if (this.idleRenderRunning) return;
+    this.idleRenderRunning = false; // Reset flag
     
-    // Achievement System initialisieren
-    if (!achievementSystem) {
-      achievementSystem = new AchievementSystem();
-      await achievementSystem.init();
-    }
+    const idleLoop = () => {
+      if (!this.isRunning) {
+        this.render(); // Rendere Hintergrund auch wenn Spiel nicht läuft
+      }
+      if (!this.isRunning) {
+        requestAnimationFrame(idleLoop);
+      } else {
+        this.idleRenderRunning = false;
+      }
+    };
     
-    // Initiales Rendering (damit Canvas sichtbar ist)
-    this.render();
+    requestAnimationFrame(idleLoop);
   }
   
   // Assets laden
@@ -737,27 +780,45 @@ class Game {
     };
   }
   
-  // Rendering (Optimiert für 60 FPS)
+  // Rendering (Optimiert für 60 FPS) - IMMER rendern, auch wenn Spiel nicht läuft
   render() {
     // Prüfe ob Canvas existiert und gültige Größe hat
-    if (!this.canvas || !this.ctx || this.canvas.width === 0 || this.canvas.height === 0) {
-      return; // Canvas noch nicht initialisiert
+    if (!this.canvas || !this.ctx) {
+      console.warn('Canvas nicht verfügbar');
+      return;
+    }
+    
+    // Sicherstellen dass Canvas gültige Größe hat
+    if (this.canvas.width === 0 || this.canvas.height === 0) {
+      this.resizeCanvas();
+      if (this.canvas.width === 0 || this.canvas.height === 0) {
+        return; // Canvas noch nicht bereit
+      }
     }
     
     // Clear Canvas (schnellste Methode)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
     // Hintergrund zeichnen (zuerst, unter allem) - IMMER, auch wenn Spiel nicht läuft
-    if (this.background) {
+    if (this.background && this.background.loaded) {
       this.background.render(this.ctx, this.gridWidth, this.gridHeight, this.cellSize);
     } else {
-      // Fallback: Dunkler Hintergrund
+      // Fallback: Dunkler Hintergrund mit Grid-Hinweis
       this.ctx.fillStyle = '#0A0A0A';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      // Zeige "Bereit" Text wenn Spiel nicht läuft
+      if (!this.isRunning) {
+        this.ctx.fillStyle = '#4CAF50';
+        this.ctx.font = '24px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('Bereit zum Spielen', this.canvas.width / 2, this.canvas.height / 2);
+      }
     }
     
     // Nur Game-Elemente zeichnen wenn Spiel läuft
-    if (!this.isRunning) {
+    if (!this.isRunning || !this.snake) {
       return;
     }
     
