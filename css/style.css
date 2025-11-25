@@ -214,6 +214,38 @@ html, body {
   padding-top: var(--spacing-xl);
   justify-content: flex-start;
   gap: var(--spacing-lg);
+  align-items: center;
+}
+
+/* Full Screen Header Styling */
+.fullscreen-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.fullscreen-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fullscreen-header .screen-content {
+  position: relative;
+  z-index: 1;
 }
 
 /* Full Screen Header Styling */

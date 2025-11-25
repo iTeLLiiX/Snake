@@ -26,16 +26,16 @@
   <!-- Game Container -->
   <div id="game-container" class="game-container">
     
-    <!-- Start Screen -->
-    <div id="start-screen" class="screen active">
-      <div class="screen-content">
-        <img src="assets/images/logo/weedgame.png" alt="Luca's Snake Adventure" class="logo" id="logo">
-        <div class="highscore-display">
-          <span class="highscore-label">Highscore:</span>
-          <span id="highscore-value" class="highscore-value">0</span>
+    <!-- Start Screen - Full Screen Header mit Premium Design -->
+    <div id="start-screen" class="screen active fullscreen-header">
+      <div class="screen-content negative-space">
+        <img src="assets/images/logo/weedgame.png" alt="Luca's Snake Adventure" class="logo card-3d" id="logo">
+        <div class="highscore-display glass spacious">
+          <span class="highscore-label expressive-text">Highscore:</span>
+          <span id="highscore-value" class="highscore-value display-text gradient-text">0</span>
         </div>
-        <button id="play-button" class="game-button">Spielen</button>
-        <button id="settings-button" class="game-button">Einstellungen</button>
+        <button id="play-button" class="game-button morph-button shimmer">Spielen</button>
+        <button id="settings-button" class="game-button morph-button">Einstellungen</button>
       </div>
     </div>
 
@@ -129,35 +129,52 @@
       </div>
     </div>
 
-    <!-- Settings Screen -->
+    <!-- Settings Screen - Bento Grid Design -->
     <div id="settings-screen" class="screen">
-      <div class="screen-content">
-        <h2 class="settings-title">Einstellungen</h2>
+      <div class="screen-content bento-grid">
+        <div class="bento-item bento-item-large glass">
+          <h2 class="expressive-text gradient-text">Einstellungen</h2>
+          <p class="text-secondary">Passe dein Spielerlebnis an</p>
+        </div>
         
-        <div class="setting-group">
-          <label class="setting-label">Schwierigkeit:</label>
-          <div class="difficulty-buttons">
-            <button class="difficulty-button active" data-difficulty="easy">Leicht</button>
-            <button class="difficulty-button" data-difficulty="medium">Mittel</button>
-            <button class="difficulty-button" data-difficulty="hard">Schwer</button>
-          </div>
+        <div class="bento-item glass card-3d">
+          <label class="display-text">
+            <input type="checkbox" id="sound-toggle" checked>
+            <span>🔊 Sound</span>
+          </label>
         </div>
-
-        <div class="setting-group">
-          <label class="setting-label">Steuerung:</label>
-          <div class="control-buttons">
-            <button class="control-button active" data-control="swipe">Swipe</button>
-            <button class="control-button" data-control="dpad">D-Pad</button>
-          </div>
+        
+        <div class="bento-item glass card-3d">
+          <label class="display-text">
+            <input type="checkbox" id="music-toggle" checked>
+            <span>🎵 Musik</span>
+          </label>
         </div>
-
-        <div class="setting-group">
-          <label class="setting-label">Sound:</label>
-          <input type="checkbox" id="sound-toggle" class="sound-toggle" checked>
-          <label for="sound-toggle" class="sound-label">An</label>
+        
+        <div class="bento-item bento-item-wide glass card-3d">
+          <label class="display-text">
+            <span>⚙️ Schwierigkeit</span>
+            <div class="difficulty-buttons">
+              <button class="difficulty-button active" data-difficulty="easy">Leicht</button>
+              <button class="difficulty-button" data-difficulty="medium">Mittel</button>
+              <button class="difficulty-button" data-difficulty="hard">Schwer</button>
+            </div>
+          </label>
         </div>
-
-        <button id="back-button" class="game-button">Zurück</button>
+        
+        <div class="bento-item bento-item-wide glass card-3d">
+          <label class="display-text">
+            <span>🎮 Steuerung</span>
+            <div class="control-buttons">
+              <button class="control-button active" data-control="swipe">Swipe</button>
+              <button class="control-button" data-control="dpad">D-Pad</button>
+            </div>
+          </label>
+        </div>
+        
+        <div class="bento-item bento-item-wide glass">
+          <button id="back-button" class="game-button morph-button">Zurück</button>
+        </div>
       </div>
     </div>
 
